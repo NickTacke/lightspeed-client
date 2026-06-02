@@ -77,3 +77,14 @@ maybe("live: returns.count returns a number", async () => {
   const count = await makeClient().returns.count();
   expect(typeof count).toBe("number");
 });
+
+// checkouts (likely empty on test shop — api returns bare array, no envelope)
+maybe("live: checkouts.list returns an array", async () => {
+  const items = await makeClient().checkouts.list({ limit: 1 });
+  expect(Array.isArray(items)).toBe(true);
+});
+
+maybe("live: checkouts.count returns a number", async () => {
+  const count = await makeClient().checkouts.count();
+  expect(typeof count).toBe("number");
+});

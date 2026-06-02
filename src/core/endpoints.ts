@@ -23,4 +23,8 @@ export const EXCEPTIONS = {
   customerLogin: (id: number) => `customers/${id}/login.json`,
   customerTokens: (id: number) => `customers/${id}/tokens.json`,
   orderCredit: (id: number) => `orders/${id}/credit.json`,
+  checkoutShipmentMethods: (id: number) => `checkouts/${id}/shipment_methods.json`,
+  checkoutPaymentMethods: (id: number) => `checkouts/${id}/payment_methods.json`,
+  checkoutValidate: (id: number) => `checkouts/${id}/validate.json`,
+  checkoutOrder: (id: number) => `checkouts/${id}/order.json`,
 } as const;
