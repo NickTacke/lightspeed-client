@@ -69,15 +69,15 @@ for await (const product of client.products.paginate()) {
 }
 ```
 
-`paginate()` defaults to **cursor mode** (`since_id`) which is safe for large datasets and does not suffer from offset-drift when items are created during iteration. Limit is capped at 250 per page.
-
-To use offset/page mode instead (useful when you need `page`-based ordering):
+`paginate()` walks every page using **cursor mode** (`since_id`): it requests records with id greater than the highest seen so far. This is safe for arbitrarily large datasets (offset/`page` paging is capped on deep pages) and does not suffer from offset-drift when items are created mid-iteration. Limit is capped at 250 per page. Pass list filters to scope the walk:
 
 ```ts
-for await (const product of client.products.paginate({ mode: "page" } as never)) {
+for await (const product of client.products.paginate({ isVisible: true })) {
   // ...
 }
 ```
+
+If you need explicit page-by-page control, call `list({ page, limit })` in your own loop.
 
 ---
 
