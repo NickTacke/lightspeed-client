@@ -16,9 +16,15 @@ import { OrderEventResource, OrderResource } from "./resources/sales/order";
 import { QuoteResource } from "./resources/sales/quote";
 import { ReturnResource } from "./resources/sales/return";
 import { ShipmentResource } from "./resources/sales/shipment";
+import { AccountResource } from "./resources/store/account";
+import { ShopResource } from "./resources/store/shop";
+import { WebhookResource } from "./resources/store/webhook";
 
 export class LightspeedClient {
   protected readonly transport: Transport;
+  readonly account: AccountResource;
+  readonly shop: ShopResource;
+  readonly webhooks: WebhookResource;
   readonly products: ProductResource;
   readonly variants: VariantResource;
   readonly variantMovements: VariantMovementResource;
@@ -38,6 +44,9 @@ export class LightspeedClient {
   readonly groups: GroupResource;
   constructor(options: LightspeedClientOptions) {
     this.transport = new Transport(resolveConfig(options));
+    this.account = new AccountResource(this.transport);
+    this.shop = new ShopResource(this.transport);
+    this.webhooks = new WebhookResource(this.transport);
     this.products = new ProductResource(this.transport);
     this.variants = new VariantResource(this.transport);
     this.variantMovements = new VariantMovementResource(this.transport);
