@@ -49,5 +49,7 @@ test("request sends a body on POST", async () => {
     return res({ ok: true });
   });
   const c = client(f as unknown as typeof fetch);
-  await c.request({ method: "POST", path: "x.json", body: { a: 1 } });
+  const out = await c.request({ method: "POST", path: "x.json", body: { a: 1 } });
+  expect(f).toHaveBeenCalledTimes(1);
+  expect(out).toEqual({ ok: true });
 });
