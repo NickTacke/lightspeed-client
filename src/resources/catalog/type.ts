@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { resourceRef, timestamps } from "../../core/fragments";
-import type { Transport } from "../../core/http";
 import { Resource } from "../../core/resource";
 
 // live shop has no types; schema inferred from docs

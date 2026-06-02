@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { orFalse, resourceRef, timestamps } from "../../core/fragments";
+import { fileObject, orFalse, resourceRef, timestamps } from "../../core/fragments";
 import { Resource } from "../../core/resource";
 import { MetafieldResource } from "../shared/metafield";
 
@@ -79,17 +79,7 @@ export const variantSchema = timestamps
     // live: taxType is null
     taxType: z.string().nullable(),
     // live: image is false
-    image: orFalse(
-      z.object({
-        createdAt: z.string(),
-        updatedAt: z.string(),
-        extension: z.string(),
-        size: z.number(),
-        title: z.string(),
-        thumb: z.string(),
-        src: z.string(),
-      }),
-    ),
+    image: orFalse(fileObject),
     tax: resourceRef,
     product: resourceRef,
     movements: resourceRef,

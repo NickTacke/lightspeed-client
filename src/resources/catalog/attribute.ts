@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { timestamps } from "../../core/fragments";
-import type { Transport } from "../../core/http";
 import { Resource } from "../../core/resource";
 
 // live shop has no attributes; schema inferred from docs
@@ -36,6 +35,7 @@ export class AttributeResource extends Resource<Attribute> {
 
   list = (q?: Parameters<AttributeResource["list_"]>[0]) => this.list_(q);
   paginate = (q?: Parameters<AttributeResource["list_"]>[0]) => this.paginate_(q);
+  // attributes have no documented list filters
   count = (q?: Record<string, unknown>) => this.count_(q);
   get = (id: number) => this.get_(id);
   create = (input: AttributeInput) => this.create_(attributeInputSchema, input);
