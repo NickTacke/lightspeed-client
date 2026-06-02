@@ -1,3 +1,4 @@
+import type { z } from "zod";
 import { type LightspeedClientOptions, resolveConfig } from "./config";
 import { Transport } from "./core/http";
 import type { HttpMethod, Query } from "./core/types";
@@ -75,12 +76,21 @@ export class LightspeedClient {
     this.groupsCustomers = new GroupsCustomerResource(this.transport);
   }
   // raw escape hatch (fleshed out in slice 10)
-  request<T>(args: {
+  // low-level escape hatch for endpoints/params not yet covered by a resource.
+  // pass a schema to validate+type the response; omit it to get the raw body.
+  async request<T>(args: {
     method: HttpMethod;
     path: string;
     query?: Query;
     body?: unknown;
+    schema?: z.ZodType<T>;
   }): Promise<T> {
-    return this.transport.send<T>(args);
+    const raw = await this.transport.send<T>({
+      method: args.method,
+      path: args.path,
+      query: args.query,
+      body: args.body,
+    });
+    return args.schema ? args.schema.parse(raw) : (raw as T);
   }
 }
