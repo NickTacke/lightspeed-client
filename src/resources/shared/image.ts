@@ -17,7 +17,7 @@ export const imageSchema = timestamps
 export type Image = z.infer<typeof imageSchema>;
 
 export const imageInputSchema = z.object({
-  src: z.string().optional(),
+  src: z.string(),
   title: z.string().optional(),
   sortOrder: z.number().optional(),
 });

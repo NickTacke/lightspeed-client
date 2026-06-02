@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { productSchema } from "../../../src/resources/catalog/product";
+import {
+  productInputSchema,
+  productSchema,
+  productUpdateSchema,
+} from "../../../src/resources/catalog/product";
 
 // trimmed real sample from GET /nl/products.json (live shop eu1/nl, 2026-06-02)
 // adjustments from live vs plan: supplier is false (plan assumed resourceRef)
@@ -58,6 +62,15 @@ test("productSchema parses a real product", () => {
   expect(p.set).toBe(false);
   // supplier is false on live data
   expect(p.supplier).toBe(false);
+});
+
+test("productUpdateSchema allows partial update without title", () => {
+  const result = productUpdateSchema.parse({ isVisible: false });
+  expect(result.isVisible).toBe(false);
+});
+
+test("productInputSchema requires title", () => {
+  expect(productInputSchema.safeParse({}).success).toBe(false);
 });
 
 test("productSchema preserves unknown fields via passthrough", () => {

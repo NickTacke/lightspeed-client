@@ -59,6 +59,9 @@ export const productInputSchema = z.object({
 });
 export type ProductInput = z.input<typeof productInputSchema>;
 
+export const productUpdateSchema = productInputSchema.partial();
+export type ProductUpdate = z.input<typeof productUpdateSchema>;
+
 export interface ProductFilters {
   brand?: number;
   supplier?: number;
@@ -78,7 +81,7 @@ export class ProductResource extends Resource<Product> {
   count = (q?: ProductFilters) => this.count_(q as Record<string, unknown>);
   get = (id: number) => this.get_(id);
   create = (input: ProductInput) => this.create_(productInputSchema, input);
-  update = (id: number, input: ProductInput) => this.update_(id, productInputSchema, input);
+  update = (id: number, input: ProductUpdate) => this.update_(id, productUpdateSchema, input);
   delete = (id: number) => this.delete_(id);
 
   images = (id: number) =>

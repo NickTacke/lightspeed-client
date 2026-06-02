@@ -14,7 +14,12 @@ export {
 export type { ListQuery, Cluster, Hooks } from "./core/types";
 export * from "./constants/enums";
 export { ProductResource } from "./resources/catalog/product";
-export type { Product, ProductInput, ProductFilters } from "./resources/catalog/product";
+export type {
+  Product,
+  ProductInput,
+  ProductUpdate,
+  ProductFilters,
+} from "./resources/catalog/product";
 export { MetafieldResource } from "./resources/shared/metafield";
 export type { Metafield, MetafieldInput } from "./resources/shared/metafield";
 export { ImageCollectionResource, SingleImageResource } from "./resources/shared/image";
