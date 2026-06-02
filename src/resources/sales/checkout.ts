@@ -3,7 +3,6 @@ import { EXCEPTIONS } from "../../core/endpoints";
 import { LightspeedValidationError } from "../../core/errors";
 import type { Transport } from "../../core/http";
 import type { ListQuery } from "../../core/types";
-import type { Order } from "./order";
 
 // checkout api is a v2-style api: snake_case fields, no envelopes, bare arrays
 // all schemas use .passthrough() — shapes are docs-derived and unvalidated live
@@ -308,14 +307,13 @@ export class CheckoutResource {
       path: EXCEPTIONS.checkoutValidate(id),
     });
 
-  // POST checkouts/{id}/order.json — converts checkout to order; returns Order
-  // response is assumed to be the order object directly (unvalidated live — test shop has no checkouts)
-  order = (id: number, input?: Record<string, unknown>): Promise<Order> =>
-    this.transport.send<Order>({
+  // POST checkouts/{id}/order.json — converts checkout to an order.
+  // response shape is undocumented/unverified (checkout api is snake_case, not the camelCase Order);
+  // returned as unknown until validated against a live checkout conversion.
+  order = (id: number, input?: Record<string, unknown>): Promise<unknown> =>
+    this.transport.send({
       method: "POST",
       path: EXCEPTIONS.checkoutOrder(id),
       body: input,
     });
 }
-
-export { CheckoutResource as default };
