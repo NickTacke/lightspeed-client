@@ -57,3 +57,45 @@ export { MetafieldResource } from "./resources/shared/metafield";
 export type { Metafield, MetafieldInput } from "./resources/shared/metafield";
 export { ImageCollectionResource, SingleImageResource } from "./resources/shared/image";
 export type { Image } from "./resources/shared/image";
+export { OrderResource, OrderProductResource, OrderEventResource } from "./resources/sales/order";
+export type {
+  Order,
+  OrderUpdate,
+  OrderFilters,
+  OrderProduct,
+  OrderEvent,
+  OrderCreditInput,
+} from "./resources/sales/order";
+export {
+  QuoteResource,
+  QuoteProductResource,
+  QuoteShippingMethodResource,
+  QuotePaymentMethodResource,
+} from "./resources/sales/quote";
+export type {
+  Quote,
+  QuoteInput,
+  QuoteUpdate,
+  QuoteFilters,
+  QuoteProduct,
+  QuoteProductInput,
+  QuoteProductUpdate,
+  QuoteShippingMethod,
+  QuotePaymentMethod,
+} from "./resources/sales/quote";
+export { InvoiceResource, InvoiceItemResource } from "./resources/sales/invoice";
+export type {
+  Invoice,
+  InvoiceUpdate,
+  InvoiceFilters,
+  InvoiceItem,
+} from "./resources/sales/invoice";
+export { ShipmentResource, ShipmentProductResource } from "./resources/sales/shipment";
+export type {
+  Shipment,
+  ShipmentUpdate,
+  ShipmentFilters,
+  ShipmentProduct,
+} from "./resources/sales/shipment";
+export { ReturnResource } from "./resources/sales/return";
+export type { Return, ReturnInput, ReturnUpdate, ReturnFilters } from "./resources/sales/return";
