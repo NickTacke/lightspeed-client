@@ -125,4 +125,25 @@ export abstract class SingletonResource<T> {
       throw new LightspeedValidationError("invalid response", parsed.error.issues);
     return parsed.data;
   }
+
+  protected async create_<I>(
+    inputSchema: z.ZodType<unknown, z.ZodTypeDef, I>,
+    input: I,
+  ): Promise<T> {
+    const parsed = inputSchema.safeParse(input);
+    if (!parsed.success)
+      throw new LightspeedValidationError("invalid request", parsed.error.issues);
+    const raw = await this.transport.send<Record<string, unknown>>({
+      method: "POST",
+      path: `${this.base}.json`,
+      body: { [this.key]: parsed.data },
+    });
+    const out = this.schema.safeParse(raw?.[this.key]);
+    if (!out.success) throw new LightspeedValidationError("invalid response", out.error.issues);
+    return out.data;
+  }
+
+  protected async delete_(): Promise<void> {
+    await this.transport.send({ method: "DELETE", path: `${this.base}.json` });
+  }
 }

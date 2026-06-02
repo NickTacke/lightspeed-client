@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { LightspeedValidationError } from "../../core/errors";
 import { timestamps } from "../../core/fragments";
 import type { Transport } from "../../core/http";
-import { Resource } from "../../core/resource";
+import { Resource, SingletonResource } from "../../core/resource";
 
 export const imageSchema = timestamps
   .extend({
@@ -47,40 +46,17 @@ export class ImageCollectionResource extends Resource<Image> {
 
 // singleton: brands/{id}/image, categories/{id}/image — get/create/delete, no id, no list
 // always uses envelope key "image"
-export class SingleImageResource {
-  private readonly base: string;
-  constructor(
-    private readonly transport: Transport,
-    prefix: string,
-  ) {
+export class SingleImageResource extends SingletonResource<Image> {
+  protected schema = imageSchema;
+  protected key = "image";
+  protected base: string;
+
+  constructor(transport: Transport, prefix: string) {
+    super(transport);
     this.base = `${prefix}/image`;
   }
 
-  async get(): Promise<Image> {
-    const raw = await this.transport.send<Record<string, unknown>>({
-      method: "GET",
-      path: `${this.base}.json`,
-    });
-    const parsed = imageSchema.safeParse(raw?.image);
-    if (!parsed.success)
-      throw new LightspeedValidationError("invalid image response", parsed.error.issues);
-    return parsed.data;
-  }
-
-  async create(input: ImageInput): Promise<Image> {
-    const body = imageInputSchema.parse(input);
-    const raw = await this.transport.send<Record<string, unknown>>({
-      method: "POST",
-      path: `${this.base}.json`,
-      body: { image: body },
-    });
-    const parsed = imageSchema.safeParse(raw?.image);
-    if (!parsed.success)
-      throw new LightspeedValidationError("invalid image response", parsed.error.issues);
-    return parsed.data;
-  }
-
-  async delete(): Promise<void> {
-    await this.transport.send({ method: "DELETE", path: `${this.base}.json` });
-  }
+  get = () => this.get_();
+  create = (input: ImageInput) => this.create_(imageInputSchema, input);
+  delete = () => this.delete_();
 }

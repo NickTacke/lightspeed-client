@@ -81,8 +81,10 @@ export class ProductResource extends Resource<Product> {
   update = (id: number, input: ProductInput) => this.update_(id, productInputSchema, input);
   delete = (id: number) => this.delete_(id);
 
-  images = (id: number) => new ImageCollectionResource(this.transport, `products/${id}`, "product");
-  metafields = (id: number) => new MetafieldResource(this.transport, `products/${id}`, "product");
+  images = (id: number) =>
+    new ImageCollectionResource(this.transport, `${this.base}/${id}`, this.singular);
+  metafields = (id: number) =>
+    new MetafieldResource(this.transport, `${this.base}/${id}`, this.singular);
 }
 
 export { ProductResource as default };

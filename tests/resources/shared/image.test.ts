@@ -80,4 +80,14 @@ describe("SingleImageResource paths", () => {
     await r.get();
     expect((calls[0] as { path: string }).path).toBe("brands/5/image.json");
   });
+
+  test("create hits base/image.json with image envelope", async () => {
+    calls.length = 0;
+    const r = new SingleImageResource(fakeTransport as never, "brands/5");
+    await r.create({ src: "https://example.com/img.png" });
+    const req = calls[0] as { method: string; path: string; body: Record<string, unknown> };
+    expect(req.path).toBe("brands/5/image.json");
+    expect(req.method).toBe("POST");
+    expect(req.body).toHaveProperty("image");
+  });
 });
