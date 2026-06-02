@@ -120,3 +120,9 @@ export type {
 } from "./resources/customers/customer";
 export { GroupResource } from "./resources/customers/group";
 export type { Group, GroupInput, GroupUpdate } from "./resources/customers/group";
+export { AccountResource } from "./resources/store/account";
+export type { Account, AccountPermissions, AccountRateLimit } from "./resources/store/account";
+export { ShopResource } from "./resources/store/shop";
+export type { Shop } from "./resources/store/shop";
+export { WebhookResource } from "./resources/store/webhook";
+export type { Webhook, WebhookInput, WebhookUpdate } from "./resources/store/webhook";
