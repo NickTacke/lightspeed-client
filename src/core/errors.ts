@@ -39,6 +39,13 @@ export class LightspeedRateLimitError extends LightspeedApiError {
   name = "LightspeedRateLimitError";
 }
 
+export class LightspeedTimeoutError extends LightspeedError {
+  constructor(readonly timeoutMs: number) {
+    super(`lightspeed request timed out after ${timeoutMs}ms`);
+    this.name = "LightspeedTimeoutError";
+  }
+}
+
 interface Parsed {
   message: string;
   code: string | number | undefined;

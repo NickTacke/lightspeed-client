@@ -9,5 +9,6 @@ export {
   LightspeedBadRequestError,
   LightspeedServerError,
   LightspeedRateLimitError,
+  LightspeedTimeoutError,
 } from "./core/errors";
 export type { ListQuery, Cluster, Hooks } from "./core/types";

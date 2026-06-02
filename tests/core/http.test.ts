@@ -1,6 +1,6 @@
 import { expect, mock, test } from "bun:test";
 import { resolveConfig } from "../../src/config";
-import { LightspeedAuthError } from "../../src/core/errors";
+import { LightspeedAuthError, LightspeedTimeoutError } from "../../src/core/errors";
 import { Transport } from "../../src/core/http";
 
 const makeRes = (status: number, body: unknown, headers: Record<string, string> = {}) =>
@@ -62,4 +62,21 @@ test("does NOT retry POST by default", async () => {
   const t = transport(f as unknown as typeof fetch);
   await expect(t.send({ method: "POST", path: "x.json", body: {} })).rejects.toThrow();
   expect(n).toBe(1);
+});
+
+test("timeout produces LightspeedTimeoutError", async () => {
+  const f = mock(async (_url: string, init: RequestInit) => {
+    // wait until the signal aborts, then reject
+    return new Promise<Response>((_resolve, reject) => {
+      init.signal?.addEventListener("abort", () => {
+        const err = new Error("aborted");
+        err.name = "AbortError";
+        reject(err);
+      });
+    });
+  });
+  const t = transport(f as unknown as typeof fetch, { timeoutMs: 1, retry: { maxRetries: 0 } });
+  await expect(t.send({ method: "GET", path: "x.json" })).rejects.toBeInstanceOf(
+    LightspeedTimeoutError,
+  );
 });

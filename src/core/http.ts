@@ -1,6 +1,6 @@
 import type { ResolvedConfig } from "../config";
 import { basicAuthHeader } from "./base64";
-import { LightspeedApiError, LightspeedRateLimitError, parseError } from "./errors";
+import { LightspeedApiError, LightspeedTimeoutError, parseError } from "./errors";
 import { RateLimitTracker } from "./rate-limit";
 import type { HttpMethod, Query, RequestContext } from "./types";
 
@@ -38,11 +38,13 @@ export class Transport {
 
     const canRetry = this.cfg.retry.retryMethods.includes(args.method);
     let attempt = 0;
+    let skipThrottle = false;
     while (true) {
-      if (this.cfg.proactive) {
+      if (this.cfg.proactive && !skipThrottle) {
         const wait = this.limiter.delayMs();
         if (wait > 0) await sleep(wait);
       }
+      skipThrottle = false;
       const controller = new AbortController();
       let timedOut = false;
       const timer = setTimeout(() => {
@@ -65,9 +67,19 @@ export class Transport {
           body = text ? JSON.parse(text) : undefined;
         } catch {
           if (!res.ok) {
-            const e = parseError(res.status, text, headerObj);
-            await this.cfg.hooks.onError?.(e);
-            throw e;
+            if (
+              canRetry &&
+              this.cfg.retry.retryStatuses.includes(res.status) &&
+              attempt < this.cfg.retry.maxRetries
+            ) {
+              attempt++;
+              await sleep(this.retryDelay(attempt, res.status, headerObj));
+              skipThrottle = true;
+              continue;
+            }
+            const err = parseError(res.status, text, headerObj);
+            await this.cfg.hooks.onError?.(err);
+            throw err;
           }
           const e = new LightspeedApiError(
             res.status,
@@ -90,6 +102,7 @@ export class Transport {
         ) {
           attempt++;
           await sleep(this.retryDelay(attempt, res.status, headerObj));
+          skipThrottle = true;
           continue;
         }
         const e = parseError(res.status, body, headerObj);
@@ -101,17 +114,10 @@ export class Transport {
         if (canRetry && this.isRetryable(e) && attempt < this.cfg.retry.maxRetries) {
           attempt++;
           await sleep(this.cfg.retry.backoffFactor * 2 ** (attempt - 1) * 100);
+          skipThrottle = true;
           continue;
         }
-        const surfaced = timedOut
-          ? new LightspeedApiError(
-              0,
-              `request timed out after ${this.cfg.timeoutMs}ms`,
-              "TIMEOUT",
-              undefined,
-              undefined,
-            )
-          : e;
+        const surfaced = timedOut ? new LightspeedTimeoutError(this.cfg.timeoutMs) : e;
         await this.cfg.hooks.onError?.(surfaced);
         throw surfaced;
       }

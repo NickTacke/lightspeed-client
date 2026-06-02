@@ -14,6 +14,7 @@ export abstract class Resource<T> {
   protected abstract plural: string;
   constructor(protected readonly transport: Transport) {}
 
+  // scalar filters only; array-valued filters need per-resource handling
   protected toQuery(q?: ListQuery & Record<string, unknown>): Query | undefined {
     if (!q) return undefined;
     const out: Query = {};
@@ -31,6 +32,7 @@ export abstract class Resource<T> {
       query: this.toQuery(q),
     });
     const arr = raw?.[this.plural];
+    // missing plural key -> empty list (treated as no results)
     const parsed = this.schema.array().safeParse(arr ?? []);
     if (!parsed.success)
       throw new LightspeedValidationError("invalid list response", parsed.error.issues);

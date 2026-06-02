@@ -15,6 +15,7 @@ export class RateLimitTracker {
     const rs = rem.split("/").map(Number);
     const ts = reset.split("/").map(Number);
     if (rs.some(Number.isNaN) || ts.some(Number.isNaN)) return;
+    if (rs.length !== ts.length) return;
     this.buckets = rs.map((r, i) => ({ remaining: r, resetSec: ts[i] ?? 0 }));
   }
 

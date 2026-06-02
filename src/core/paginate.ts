@@ -19,6 +19,7 @@ export async function* paginate<T>(
   const mode = opts?.mode ?? "cursor";
   const idOf = opts?.idOf ?? ((item: T) => (item as unknown as { id: number }).id);
   let page = opts?.startPage ?? 1;
+  // cursor mode assumes numeric ascending ids (idOf default reads item.id)
   let since = 0;
   while (true) {
     const batch = await fetchPage(mode === "cursor" ? { since_id: since } : { page }, limit);
