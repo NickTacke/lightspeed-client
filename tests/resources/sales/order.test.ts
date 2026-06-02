@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { LightspeedValidationError } from "../../../src/core/errors";
 import { LightspeedClient } from "../../../src/index";
 import {
   OrderEventResource,
@@ -118,6 +119,16 @@ test("OrderResource.credit(id) POSTs to orders/{id}/credit.json with credit enve
     path: "orders/5/credit.json",
     body: { credit: { creditPayment: true, creditShipment: false } },
   });
+});
+
+test("OrderResource.credit throws LightspeedValidationError on invalid input", async () => {
+  const t = new FakeTransport(() => ({}));
+  // biome-ignore lint/suspicious/noExplicitAny: test fake cast
+  const r = new OrderResource(t as any);
+  // orderProducts items require id+quantity; passing a string triggers validation failure
+  await expect(
+    r.credit(5, { orderProducts: [{ id: "bad" } as unknown as { id: number; quantity: number }] }),
+  ).rejects.toBeInstanceOf(LightspeedValidationError);
 });
 
 test("client.orders is an OrderResource", () => {

@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { OrderPaymentStatus, OrderShipmentStatus, OrderStatus } from "../../constants/enums";
+import { EXCEPTIONS } from "../../core/endpoints";
+import { LightspeedValidationError } from "../../core/errors";
 import { orFalse, resourceRef, timestamps } from "../../core/fragments";
 import type { Transport } from "../../core/http";
 import { Resource } from "../../core/resource";
@@ -182,10 +184,11 @@ export class OrderResource extends Resource<Order> {
   // POST /orders/{id}/credit.json — envelope key "credit" per Postman
   credit = async (id: number, input: OrderCreditInput): Promise<unknown> => {
     const parsed = orderCreditInputSchema.safeParse(input);
-    if (!parsed.success) throw new Error("invalid credit input");
+    if (!parsed.success)
+      throw new LightspeedValidationError("invalid credit input", parsed.error.issues);
     return this.transport.send({
       method: "POST",
-      path: `${this.base}/${id}/credit.json`,
+      path: EXCEPTIONS.orderCredit(id),
       body: { credit: parsed.data },
     });
   };
