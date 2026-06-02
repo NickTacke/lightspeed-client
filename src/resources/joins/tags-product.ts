@@ -11,10 +11,10 @@ export const tagsProductSchema = z
   .passthrough();
 export type TagsProduct = z.infer<typeof tagsProductSchema>;
 
+// no sortOrder: the api never returns it on tagsProduct and ignores it on create
 export const tagsProductInputSchema = z.object({
   tag: z.number(),
   product: z.number(),
-  sortOrder: z.number().optional(),
 });
 export type TagsProductInput = z.input<typeof tagsProductInputSchema>;
 
