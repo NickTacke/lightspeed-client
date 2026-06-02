@@ -25,31 +25,35 @@ describe("metafieldSchema", () => {
 });
 
 describe("MetafieldResource paths", () => {
-  const fakeTransport = {
-    calls: [] as unknown[],
-    send: async (args: unknown) => {
-      (fakeTransport.calls as unknown[]).push(args);
+  let calls: unknown[] = [];
+  // typed as returning unknown so we can swap responses per test
+  const fakeTransport: { send: (args: unknown) => Promise<unknown> } = {
+    send: async (args) => {
+      calls.push(args);
       return { productMetafields: [sample] };
     },
   };
 
   test("list uses parent prefix path", async () => {
+    calls = [];
+    fakeTransport.send = async (args) => {
+      calls.push(args);
+      return { productMetafields: [sample] };
+    };
     const r = new MetafieldResource(fakeTransport as never, "products/5", "product");
     await r.list();
-    expect((fakeTransport.calls[0] as { path: string }).path).toBe("products/5/metafields.json");
+    expect((calls[0] as { path: string }).path).toBe("products/5/metafields.json");
   });
 
   test("get uses parent prefix path", async () => {
-    fakeTransport.calls = [];
-    fakeTransport.send = async (args: unknown) => {
-      fakeTransport.calls.push(args);
+    calls = [];
+    fakeTransport.send = async (args) => {
+      calls.push(args);
       return { productMetafield: sample };
     };
     const r = new MetafieldResource(fakeTransport as never, "products/5", "product");
     const m = await r.get(284908443);
-    expect((fakeTransport.calls[0] as { path: string }).path).toBe(
-      "products/5/metafields/284908443.json",
-    );
+    expect((calls[0] as { path: string }).path).toBe("products/5/metafields/284908443.json");
     expect(m.id).toBe(284908443);
   });
 });

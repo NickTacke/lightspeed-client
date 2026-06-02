@@ -34,23 +34,28 @@ describe("imageSchema", () => {
 });
 
 describe("ImageCollectionResource paths", () => {
-  const calls: unknown[] = [];
-  const fakeTransport = {
-    send: async (args: unknown) => {
+  let calls: unknown[] = [];
+  const fakeTransport: { send: (args: unknown) => Promise<unknown> } = {
+    send: async (args) => {
       calls.push(args);
       return { productImages: [sample] };
     },
   };
 
   test("list uses parent prefix path", async () => {
+    calls = [];
+    fakeTransport.send = async (args) => {
+      calls.push(args);
+      return { productImages: [sample] };
+    };
     const r = new ImageCollectionResource(fakeTransport as never, "products/5", "product");
     await r.list();
     expect((calls[0] as { path: string }).path).toBe("products/5/images.json");
   });
 
   test("get uses parent prefix path", async () => {
-    calls.splice(0);
-    (fakeTransport as { send: (a: unknown) => Promise<unknown> }).send = async (args) => {
+    calls = [];
+    fakeTransport.send = async (args) => {
       calls.push(args);
       return { productImage: sample };
     };
