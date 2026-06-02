@@ -5,7 +5,7 @@ import { accountSchema } from "../../../src/resources/store/account";
 const sample = {
   id: 389694,
   appId: false,
-  apiKey: "bbcc13c37677dbd237d6d402406cca7b",
+  apiKey: "test-api-key",
   signout: {
     resource: {
       id: false,

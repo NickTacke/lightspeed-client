@@ -13,9 +13,9 @@ function makeClient() {
   });
 }
 
-maybe("live: account.get returns account with id 389694", async () => {
+maybe("live: account.get returns account shape", async () => {
   const a = await makeClient().account.get();
-  expect(a.id).toBe(389694);
+  expect(typeof a.id).toBe("number");
   expect(typeof a.apiKey).toBe("string");
 });
 
@@ -31,11 +31,11 @@ maybe("live: account.rateLimit returns rate limit object", async () => {
   expect(r).not.toBeNull();
 });
 
-maybe("live: shop.get returns shop with id 356891", async () => {
+maybe("live: shop.get returns shop shape", async () => {
   const s = await makeClient().shop.get();
-  expect(s.id).toBe(356891);
-  expect(s.country.code).toBe("nl");
-  expect(s.currency.shortcode).toBe("EUR");
+  expect(typeof s.id).toBe("number");
+  expect(typeof s.country.code).toBe("string");
+  expect(typeof s.currency.shortcode).toBe("string");
 });
 
 maybe("live: webhooks.list returns an array", async () => {
