@@ -99,3 +99,14 @@ export type {
 } from "./resources/sales/shipment";
 export { ReturnResource } from "./resources/sales/return";
 export type { Return, ReturnInput, ReturnUpdate, ReturnFilters } from "./resources/sales/return";
+export { CheckoutResource, CheckoutProductResource } from "./resources/sales/checkout";
+export type {
+  Checkout,
+  CheckoutInput,
+  CheckoutUpdate,
+  CheckoutProduct,
+  CheckoutProductInput,
+  CheckoutProductUpdate,
+  CheckoutShipmentMethod,
+  CheckoutPaymentMethod,
+} from "./resources/sales/checkout";
