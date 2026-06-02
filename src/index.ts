@@ -110,3 +110,13 @@ export type {
   CheckoutShipmentMethod,
   CheckoutPaymentMethod,
 } from "./resources/sales/checkout";
+export { CustomerResource } from "./resources/customers/customer";
+export type {
+  Customer,
+  CustomerInput,
+  CustomerUpdate,
+  CustomerFilters,
+  CustomerLoginInput,
+} from "./resources/customers/customer";
+export { GroupResource } from "./resources/customers/group";
+export type { Group, GroupInput, GroupUpdate } from "./resources/customers/group";

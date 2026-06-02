@@ -8,6 +8,8 @@ import { ProductResource } from "./resources/catalog/product";
 import { TagResource } from "./resources/catalog/tag";
 import { TypeResource } from "./resources/catalog/type";
 import { VariantMovementResource, VariantResource } from "./resources/catalog/variant";
+import { CustomerResource } from "./resources/customers/customer";
+import { GroupResource } from "./resources/customers/group";
 import { CheckoutResource } from "./resources/sales/checkout";
 import { InvoiceResource } from "./resources/sales/invoice";
 import { OrderEventResource, OrderResource } from "./resources/sales/order";
@@ -32,6 +34,8 @@ export class LightspeedClient {
   readonly shipments: ShipmentResource;
   readonly returns: ReturnResource;
   readonly checkouts: CheckoutResource;
+  readonly customers: CustomerResource;
+  readonly groups: GroupResource;
   constructor(options: LightspeedClientOptions) {
     this.transport = new Transport(resolveConfig(options));
     this.products = new ProductResource(this.transport);
@@ -49,6 +53,8 @@ export class LightspeedClient {
     this.shipments = new ShipmentResource(this.transport);
     this.returns = new ReturnResource(this.transport);
     this.checkouts = new CheckoutResource(this.transport);
+    this.customers = new CustomerResource(this.transport);
+    this.groups = new GroupResource(this.transport);
   }
   // raw escape hatch (fleshed out in slice 10)
   request<T>(args: {
