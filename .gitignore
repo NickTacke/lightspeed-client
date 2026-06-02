@@ -1,0 +1,7 @@
+node_modules
+dist
+docs/plans/
+docs/superpowers/
+*.log
+.DS_Store
+*.postman_collection.json
