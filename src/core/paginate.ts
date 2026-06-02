@@ -25,7 +25,14 @@ export async function* paginate<T>(
     const batch = await fetchPage(mode === "cursor" ? { since_id: since } : { page }, limit);
     for (const item of batch) {
       yield item;
-      if (mode === "cursor") since = Math.max(since, idOf(item));
+      if (mode === "cursor") {
+        const id = idOf(item);
+        if (!Number.isFinite(id))
+          throw new Error(
+            "paginate: cursor mode requires a finite numeric id; pass a page-mode option or idOf",
+          );
+        since = Math.max(since, id);
+      }
     }
     if (batch.length < limit) return;
     page++;

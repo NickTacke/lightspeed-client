@@ -34,7 +34,6 @@ export class Transport {
     };
     if (args.body !== undefined) headers["Content-Type"] = "application/json";
     const ctx: RequestContext = { method: args.method, url, headers, body: args.body };
-    await this.cfg.hooks.onRequest?.(ctx);
 
     const canRetry = this.cfg.retry.retryMethods.includes(args.method);
     let attempt = 0;
@@ -45,6 +44,7 @@ export class Transport {
         if (wait > 0) await sleep(wait);
       }
       skipThrottle = false;
+      await this.cfg.hooks.onRequest?.(ctx);
       const controller = new AbortController();
       let timedOut = false;
       const timer = setTimeout(() => {

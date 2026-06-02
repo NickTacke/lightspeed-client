@@ -12,6 +12,19 @@ test("cursor mode walks via since_id of the max id, until a short page", async (
   expect(out).toEqual([1, 2, 3, 4, 5]);
 });
 
+test("cursor mode throws when item has no finite numeric id", async () => {
+  const fetchPage = async () => [{ name: "a" }];
+  let threw = false;
+  try {
+    for await (const _ of paginate(fetchPage as never)) {
+      // consume
+    }
+  } catch {
+    threw = true;
+  }
+  expect(threw).toBe(true);
+});
+
 test("page mode increments page until a short page", async () => {
   const pages: Record<number, number[]> = { 1: [1, 2], 2: [3, 4], 3: [5] };
   const fetchPage = async (cur: { page?: number }, _limit: number) => pages[cur.page ?? 1] ?? [];

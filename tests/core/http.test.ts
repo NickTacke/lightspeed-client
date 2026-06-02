@@ -53,6 +53,26 @@ test("retries GET on 429 then succeeds", async () => {
   expect(n).toBe(2);
 });
 
+test("onRequest fires once per attempt including retries", async () => {
+  let n = 0;
+  const f = mock(async () => {
+    n++;
+    return n === 1
+      ? makeRes(429, { error: { message: "slow" } }, { "retry-after": "0" })
+      : makeRes(200, { ok: true });
+  });
+  let hookCalls = 0;
+  const t = transport(f as unknown as typeof fetch, {
+    hooks: {
+      onRequest: async () => {
+        hookCalls++;
+      },
+    },
+  });
+  await t.send({ method: "GET", path: "x.json" });
+  expect(hookCalls).toBe(2);
+});
+
 test("does NOT retry POST by default", async () => {
   let n = 0;
   const f = mock(async () => {

@@ -19,7 +19,7 @@ export abstract class Resource<T> {
     if (!q) return undefined;
     const out: Query = {};
     for (const [k, v] of Object.entries(q)) {
-      if (v === undefined) continue;
+      if (v === undefined || v === null) continue;
       out[k] = typeof v === "object" ? JSON.stringify(v) : (v as string | number | boolean);
     }
     return out;
