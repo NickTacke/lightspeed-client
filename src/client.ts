@@ -75,7 +75,6 @@ export class LightspeedClient {
     this.tagsProducts = new TagsProductResource(this.transport);
     this.groupsCustomers = new GroupsCustomerResource(this.transport);
   }
-  // raw escape hatch (fleshed out in slice 10)
   // low-level escape hatch for endpoints/params not yet covered by a resource.
   // pass a schema to validate+type the response; omit it to get the raw body.
   async request<T>(args: {
