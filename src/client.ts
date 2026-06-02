@@ -7,12 +7,13 @@ import { CategoryResource } from "./resources/catalog/category";
 import { ProductResource } from "./resources/catalog/product";
 import { TagResource } from "./resources/catalog/tag";
 import { TypeResource } from "./resources/catalog/type";
-import { VariantResource } from "./resources/catalog/variant";
+import { VariantMovementResource, VariantResource } from "./resources/catalog/variant";
 
 export class LightspeedClient {
   protected readonly transport: Transport;
   readonly products: ProductResource;
   readonly variants: VariantResource;
+  readonly variantMovements: VariantMovementResource;
   readonly categories: CategoryResource;
   readonly brands: BrandResource;
   readonly types: TypeResource;
@@ -22,6 +23,7 @@ export class LightspeedClient {
     this.transport = new Transport(resolveConfig(options));
     this.products = new ProductResource(this.transport);
     this.variants = new VariantResource(this.transport);
+    this.variantMovements = new VariantMovementResource(this.transport);
     this.categories = new CategoryResource(this.transport);
     this.brands = new BrandResource(this.transport);
     this.types = new TypeResource(this.transport);

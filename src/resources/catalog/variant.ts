@@ -1,41 +1,35 @@
 import { z } from "zod";
 import { orFalse, resourceRef, timestamps } from "../../core/fragments";
-import type { Transport } from "../../core/http";
 import { Resource } from "../../core/resource";
 import { MetafieldResource } from "../shared/metafield";
 
-// live: envelope key "variantsMovements" (plural has trailing "s") for list/count
-// singular unknown (no movement records in test shop) — assuming "variantMovement"
-export const movementSchema = timestamps
+export const variantMovementSchema = timestamps
   .extend({
     id: z.number(),
-    // hs (harmonized system code) appears as null on live variants, so optional here
     type: z.string().optional(),
     amount: z.number().optional(),
     description: z.string().optional(),
     variant: resourceRef.optional(),
   })
   .passthrough();
-export type Movement = z.infer<typeof movementSchema>;
+export type VariantMovement = z.infer<typeof variantMovementSchema>;
 
-export class MovementResource extends Resource<Movement> {
-  protected schema = movementSchema;
-  protected singular: string;
-  protected plural: string;
-  protected base: string;
+export interface VariantMovementFilters {
+  variant?: number;
+}
 
-  constructor(transport: Transport, parentBase: string) {
-    super(transport);
-    // base is e.g. "variants/movements" — not nested under id
-    this.base = `${parentBase}/movements`;
-    // live: plural envelope is "variantsMovements"
-    this.singular = "variantMovement";
-    this.plural = "variantsMovements";
-  }
+// live: plural envelope "variantsMovements" (confirmed); singular "variantMovement" (unconfirmed — no records in test shop)
+export class VariantMovementResource extends Resource<VariantMovement> {
+  protected base = "variants/movements";
+  protected schema = variantMovementSchema;
+  protected singular = "variantMovement";
+  protected plural = "variantsMovements";
 
-  list = (q?: Parameters<MovementResource["list_"]>[0]) => this.list_(q);
-  paginate = (q?: Parameters<MovementResource["list_"]>[0]) => this.paginate_(q);
-  count = (q?: Record<string, unknown>) => this.count_(q);
+  list = (q?: VariantMovementFilters & Parameters<VariantMovementResource["list_"]>[0]) =>
+    this.list_(q);
+  paginate = (q?: VariantMovementFilters & Parameters<VariantMovementResource["list_"]>[0]) =>
+    this.paginate_(q);
+  count = (q?: VariantMovementFilters) => this.count_(q as Record<string, unknown>);
   get = (id: number) => this.get_(id);
 }
 
@@ -166,7 +160,6 @@ export class VariantResource extends Resource<Variant> {
 
   metafields = (id: number) =>
     new MetafieldResource(this.transport, `${this.base}/${id}`, this.singular);
-  movements = (_id: number) => new MovementResource(this.transport, this.base);
 }
 
 export { VariantResource as default };

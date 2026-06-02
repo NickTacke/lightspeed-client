@@ -20,13 +20,14 @@ export type {
   ProductUpdate,
   ProductFilters,
 } from "./resources/catalog/product";
-export { VariantResource, MovementResource } from "./resources/catalog/variant";
+export { VariantResource, VariantMovementResource } from "./resources/catalog/variant";
 export type {
   Variant,
   VariantInput,
   VariantUpdate,
   VariantFilters,
-  Movement,
+  VariantMovement,
+  VariantMovementFilters,
 } from "./resources/catalog/variant";
 export { CategoryResource } from "./resources/catalog/category";
 export type {

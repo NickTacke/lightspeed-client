@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { LightspeedClient } from "../../../src/index";
 import {
+  VariantMovementResource,
   variantInputSchema,
   variantSchema,
   variantUpdateSchema,
@@ -108,24 +109,26 @@ test("variantSchema preserves unknown fields via passthrough", () => {
   expect((v as Record<string, unknown>).customField).toBe("extra");
 });
 
-test("VariantResource exposes correct base path", () => {
-  // the resource method returns a MetafieldResource bound to variants/322925834
-  // check that the metafields sub-resource has the correct path prefix
+test("VariantResource.metafields returns a callable MetafieldResource", () => {
   const c = new LightspeedClient({ apiKey: "k", apiSecret: "s", language: "nl" });
   const mf = c.variants.metafields(322925834);
-  // MovementResource and MetafieldResource base paths are private, but we can check
-  // that they are defined and callable
   expect(typeof mf.list).toBe("function");
   expect(typeof mf.get).toBe("function");
 });
 
-test("VariantResource.movements returns a read-only MovementResource", () => {
+test("VariantResource has no movements accessor", () => {
   const c = new LightspeedClient({ apiKey: "k", apiSecret: "s", language: "nl" });
-  const mv = c.variants.movements(322925834);
-  expect(typeof mv.list).toBe("function");
-  expect(typeof mv.get).toBe("function");
-  expect(typeof mv.count).toBe("function");
-  // no mutators
-  expect((mv as unknown as Record<string, unknown>).create).toBeUndefined();
-  expect((mv as unknown as Record<string, unknown>).delete).toBeUndefined();
+  expect((c.variants as unknown as Record<string, unknown>).movements).toBeUndefined();
+});
+
+test("client.variantMovements is a top-level VariantMovementResource", () => {
+  const c = new LightspeedClient({ apiKey: "k", apiSecret: "s", language: "nl" });
+  expect(c.variantMovements).toBeInstanceOf(VariantMovementResource);
+  expect(typeof c.variantMovements.list).toBe("function");
+  expect(typeof c.variantMovements.get).toBe("function");
+  expect(typeof c.variantMovements.count).toBe("function");
+  expect(typeof c.variantMovements.paginate).toBe("function");
+  // read-only: no mutators
+  expect((c.variantMovements as unknown as Record<string, unknown>).create).toBeUndefined();
+  expect((c.variantMovements as unknown as Record<string, unknown>).delete).toBeUndefined();
 });

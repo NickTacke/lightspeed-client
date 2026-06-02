@@ -44,10 +44,10 @@ maybe("live: variants.metafields(id).list returns variant metafields", async () 
   expect(Array.isArray(mfs)).toBe(true);
 });
 
-maybe("live: variants.movements(id).list returns variant movements", async () => {
+maybe("live: variantMovements.list({ variant: id }) returns an array", async () => {
   const [first] = await makeClient().variants.list({ limit: 1 });
   if (!first) throw new Error("no variants");
-  const mvs = await makeClient().variants.movements(first.id).list();
+  const mvs = await makeClient().variantMovements.list({ variant: first.id });
   expect(Array.isArray(mvs)).toBe(true);
 });
 
