@@ -120,6 +120,24 @@ export type {
 } from "./resources/customers/customer";
 export { GroupResource } from "./resources/customers/group";
 export type { Group, GroupInput, GroupUpdate } from "./resources/customers/group";
+export { CategoriesProductResource } from "./resources/joins/categories-product";
+export type {
+  CategoriesProduct,
+  CategoriesProductInput,
+  CategoriesProductFilters,
+} from "./resources/joins/categories-product";
+export { TagsProductResource } from "./resources/joins/tags-product";
+export type {
+  TagsProduct,
+  TagsProductInput,
+  TagsProductFilters,
+} from "./resources/joins/tags-product";
+export { GroupsCustomerResource } from "./resources/joins/groups-customer";
+export type {
+  GroupsCustomer,
+  GroupsCustomerInput,
+  GroupsCustomerFilters,
+} from "./resources/joins/groups-customer";
 export { AccountResource } from "./resources/store/account";
 export type { Account, AccountPermissions, AccountRateLimit } from "./resources/store/account";
 export { ShopResource } from "./resources/store/shop";

@@ -10,6 +10,9 @@ import { TypeResource } from "./resources/catalog/type";
 import { VariantMovementResource, VariantResource } from "./resources/catalog/variant";
 import { CustomerResource } from "./resources/customers/customer";
 import { GroupResource } from "./resources/customers/group";
+import { CategoriesProductResource } from "./resources/joins/categories-product";
+import { GroupsCustomerResource } from "./resources/joins/groups-customer";
+import { TagsProductResource } from "./resources/joins/tags-product";
 import { CheckoutResource } from "./resources/sales/checkout";
 import { InvoiceResource } from "./resources/sales/invoice";
 import { OrderEventResource, OrderResource } from "./resources/sales/order";
@@ -42,6 +45,9 @@ export class LightspeedClient {
   readonly checkouts: CheckoutResource;
   readonly customers: CustomerResource;
   readonly groups: GroupResource;
+  readonly categoriesProducts: CategoriesProductResource;
+  readonly tagsProducts: TagsProductResource;
+  readonly groupsCustomers: GroupsCustomerResource;
   constructor(options: LightspeedClientOptions) {
     this.transport = new Transport(resolveConfig(options));
     this.account = new AccountResource(this.transport);
@@ -64,6 +70,9 @@ export class LightspeedClient {
     this.checkouts = new CheckoutResource(this.transport);
     this.customers = new CustomerResource(this.transport);
     this.groups = new GroupResource(this.transport);
+    this.categoriesProducts = new CategoriesProductResource(this.transport);
+    this.tagsProducts = new TagsProductResource(this.transport);
+    this.groupsCustomers = new GroupsCustomerResource(this.transport);
   }
   // raw escape hatch (fleshed out in slice 10)
   request<T>(args: {
