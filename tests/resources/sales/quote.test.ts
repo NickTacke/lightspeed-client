@@ -45,6 +45,11 @@ test("quoteSchema: customer false still accepted", () => {
   expect(q.customer).toBe(false);
 });
 
+test("quoteSchema parses an abandoned quote with null shipmentZipcode", () => {
+  const r = quoteSchema.safeParse({ id: 1, createdAt: "x", updatedAt: "y", shipmentZipcode: null });
+  expect(r.success).toBe(true);
+});
+
 test("quoteSchema preserves unknown fields via passthrough", () => {
   const q = quoteSchema.parse({ ...sample, extra: "x" });
   expect((q as Record<string, unknown>).extra).toBe("x");
