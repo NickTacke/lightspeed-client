@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { typeInputSchema, typeSchema, typeUpdateSchema } from "../../../src/resources/catalog/type";
 
-// live-confirmed sample (GET types/{id}.json) — no createdAt/updatedAt
+// live-confirmed sample (GET types/{id}.json): no createdAt/updatedAt
 const sample = {
   id: 252474,
   title: "Electronics",

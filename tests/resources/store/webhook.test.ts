@@ -5,7 +5,7 @@ import {
   webhookUpdateSchema,
 } from "../../../src/resources/store/webhook";
 
-// live-confirmed sample (GET webhooks/{id}.json) — no url/secret/extra
+// live-confirmed sample (GET webhooks/{id}.json): no url/secret/extra
 const sample = {
   id: 4745101,
   createdAt: "2026-01-01T00:00:00+00:00",
