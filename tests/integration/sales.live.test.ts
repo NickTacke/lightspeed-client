@@ -89,6 +89,15 @@ maybe("live: checkouts.count returns a number", async () => {
   expect(typeof count).toBe("number");
 });
 
+maybe("live: checkouts.list returns camelCase checkouts", async () => {
+  const items = await makeClient().checkouts.list({ limit: 1 });
+  expect(Array.isArray(items)).toBe(true);
+  if (items[0]) {
+    expect(items[0]).not.toHaveProperty("created_at");
+    expect(items[0]).toHaveProperty("createdAt");
+  }
+});
+
 maybe("live: orders.get parses the seeded order (ORD00001)", async () => {
   const order = await makeClient().orders.get(315967958);
   expect(order.number).toBe("ORD00001");

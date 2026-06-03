@@ -1,44 +1,128 @@
 import { z } from "zod";
+import { type FieldMap, fromWire, toWire } from "../../core/casing";
 import { EXCEPTIONS } from "../../core/endpoints";
 import { LightspeedValidationError } from "../../core/errors";
 import type { Transport } from "../../core/http";
 import type { ListQuery } from "../../core/types";
 
-// checkout api is a v2-style api: snake_case fields, no envelopes, bare arrays
-// all schemas use .passthrough() — shapes are docs-derived and unvalidated live
+// checkout api is a v2-style api: snake_case fields on the wire, no envelopes,
+// bare arrays. this client normalizes the typed surface to camelCase using the
+// explicit, shallow toWire/fromWire helpers in core/casing. unmodeled snake
+// fields pass through verbatim (.passthrough()); the TYPED surface is camelCase.
+// mapping is deliberately NOT recursive — nested objects (validate errors,
+// nested products) keep their wire keys, which is intentional.
+
+// camelCase -> wire (snake) field maps
+const CHECKOUT_MAP = {
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+  orderId: "order_id",
+  billingAddress: "billing_address",
+  shippingAddress: "shipping_address",
+  shipmentMethod: "shipment_method",
+  paymentMethod: "payment_method",
+  discountCode: "discount_code",
+  giftCards: "gift_cards",
+} as const satisfies FieldMap;
+
+const CHECKOUT_PRODUCT_MAP = {
+  cartId: "cart_id",
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+  productId: "product_id",
+  variantId: "variant_id",
+  isCustom: "is_custom",
+  customChecksum: "custom_checksum",
+  customData: "custom_data",
+  hasDiscount: "has_discount",
+  discountPercentage: "discount_percentage",
+  taxRate: "tax_rate",
+  basePriceExcl: "base_price_excl",
+  basePriceIncl: "base_price_incl",
+  basePriceCost: "base_price_cost",
+  priceExcl: "price_excl",
+  priceIncl: "price_incl",
+  priceCost: "price_cost",
+  priceTax: "price_tax",
+  discountExcl: "discount_excl",
+  discountIncl: "discount_incl",
+  brandName: "brand_name",
+  articleCode: "article_code",
+  imageId: "image_id",
+  imageThumb: "image_thumb",
+  imageSrc: "image_src",
+  stockLevel: "stock_level",
+  stockAvailable: "stock_available",
+  stockOnStock: "stock_on_stock",
+} as const satisfies FieldMap;
+
+const SHIPMENT_METHOD_MAP = {
+  taxRate: "tax_rate",
+  priceExcl: "price_excl",
+  priceIncl: "price_incl",
+  basePriceIncl: "base_price_incl",
+  basePriceExcl: "base_price_excl",
+  isServicePoint: "is_service_point",
+} as const satisfies FieldMap;
+
+const PAYMENT_METHOD_MAP = {
+  postPayment: "post_payment",
+  invoiceExternal: "invoice_external",
+  taxRate: "tax_rate",
+  priceExcl: "price_excl",
+  priceIncl: "price_incl",
+} as const satisfies FieldMap;
+
+const ORDER_RESULT_MAP = {
+  orderId: "order_id",
+  paymentUrl: "payment_url",
+  paymentProvider: "payment_provider",
+} as const satisfies FieldMap;
 
 export const checkoutProductSchema = z
   .object({
     id: z.number(),
-    cart_id: z.number().optional(),
-    product_id: z.number().optional(),
-    variant_id: z.number().optional(),
+    cartId: z.number().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+    productId: z.number().optional(),
+    variantId: z.number().optional(),
+    isCustom: z.boolean().nullable().optional(),
+    customChecksum: z.string().nullable().optional(),
+    customData: z.union([z.record(z.unknown()), z.null()]).optional(),
     quantity: z.number().optional(),
-    is_custom: z.boolean().optional(),
-    has_discount: z.boolean().optional(),
-    discount_percentage: z.number().optional(),
-    tax_rate: z.number().optional(),
-    base_price_excl: z.number().optional(),
-    base_price_incl: z.number().optional(),
-    price_excl: z.number().optional(),
-    price_incl: z.number().optional(),
-    price_tax: z.number().optional(),
+    hasDiscount: z.boolean().optional(),
+    discountPercentage: z.number().optional(),
+    taxRate: z.number().optional(),
+    basePriceExcl: z.number().optional(),
+    basePriceIncl: z.number().optional(),
+    basePriceCost: z.number().optional(),
+    priceExcl: z.number().optional(),
+    priceIncl: z.number().optional(),
+    priceCost: z.number().optional(),
+    priceTax: z.number().optional(),
+    discountExcl: z.number().optional(),
+    discountIncl: z.number().optional(),
     title: z.string().optional(),
     fulltitle: z.string().optional(),
     variant: z.string().optional(),
-    brand_name: z.string().optional(),
-    image_id: z.number().optional(),
-    image_thumb: z.string().optional(),
-    image_src: z.string().optional(),
-    stock_level: z.number().optional(),
-    stock_available: z.boolean().optional(),
-    stock_on_stock: z.boolean().optional(),
+    brandName: z.string().optional(),
+    articleCode: z.string().optional(),
+    ean: z.string().optional(),
+    sku: z.string().optional(),
+    imageId: z.number().optional(),
+    imageThumb: z.string().optional(),
+    imageSrc: z.string().optional(),
+    url: z.string().optional(),
+    stockAvailable: z.boolean().optional(),
+    stockOnStock: z.boolean().optional(),
+    stockLevel: z.number().optional(),
   })
   .passthrough();
 export type CheckoutProduct = z.infer<typeof checkoutProductSchema>;
 
 export const checkoutProductInputSchema = z.object({
-  variant_id: z.number(),
+  variantId: z.number(),
   quantity: z.number(),
 });
 export type CheckoutProductInput = z.input<typeof checkoutProductInputSchema>;
@@ -54,13 +138,13 @@ export const checkoutShipmentMethodSchema = z
   .object({
     id: z.union([z.string(), z.number()]),
     title: z.string().optional(),
-    tax_rate: z.number().optional(),
-    price_excl: z.number().optional(),
-    price_incl: z.number().optional(),
-    base_price_incl: z.number().optional(),
-    base_price_excl: z.number().optional(),
-    discount: z.union([z.boolean(), z.object({}).passthrough()]).optional(),
-    is_service_point: z.boolean().optional(),
+    taxRate: z.number().optional(),
+    priceExcl: z.number().optional(),
+    priceIncl: z.number().optional(),
+    basePriceIncl: z.number().optional(),
+    basePriceExcl: z.number().optional(),
+    isServicePoint: z.boolean().optional(),
+    discount: z.union([z.boolean(), z.record(z.unknown())]).optional(),
     data: z.record(z.unknown()).optional(),
   })
   .passthrough();
@@ -71,71 +155,84 @@ export type CheckoutShipmentMethod = z.infer<typeof checkoutShipmentMethodSchema
 export const checkoutPaymentMethodSchema = z
   .object({
     id: z.union([z.string(), z.number()]),
-    method: z.string().optional(),
-    post_payment: z.boolean().optional(),
-    invoice_external: z.boolean().optional(),
+    method: z.union([z.string(), z.literal(false)]).optional(),
+    postPayment: z.boolean().optional(),
+    invoiceExternal: z.boolean().optional(),
     title: z.string().optional(),
-    tax_rate: z.number().optional(),
-    price_excl: z.number().optional(),
-    price_incl: z.number().optional(),
-    data: z.record(z.unknown()).optional(),
+    taxRate: z.number().optional(),
+    priceExcl: z.number().optional(),
+    priceIncl: z.number().optional(),
+    data: z.record(z.unknown()).nullable().optional(),
   })
   .passthrough();
 export type CheckoutPaymentMethod = z.infer<typeof checkoutPaymentMethodSchema>;
 
-// main checkout schema — snake_case, no createdAt/updatedAt (uses created_at/updated_at)
+// main checkout schema — camelCase typed surface (wire is snake_case)
 export const checkoutSchema = z
   .object({
     id: z.number(),
-    created_at: z.string().optional(),
-    updated_at: z.string().optional(),
-    order_id: z.number().nullable().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+    orderId: z.number().nullable().optional(),
     theme: z.string().nullable().optional(),
     step: z.string().optional(),
     mode: z.string().optional(),
+    info: z.record(z.unknown()).optional(),
+    customer: z.record(z.unknown()).nullable().optional(),
+    billingAddress: z.record(z.unknown()).nullable().optional(),
+    shippingAddress: z.record(z.unknown()).nullable().optional(),
+    quote: z.record(z.unknown()).optional(),
+    giftCards: z.array(z.unknown()).optional(),
+    shipmentMethod: z.union([checkoutShipmentMethodSchema, z.null()]).optional(),
+    paymentMethod: z.union([checkoutPaymentMethodSchema, z.null()]).optional(),
+    discount: z.union([z.boolean(), z.record(z.unknown())]).optional(),
     comment: z.string().nullable().optional(),
     newsletter: z.boolean().nullable().optional(),
     terms: z.boolean().optional(),
     notifications: z.boolean().optional(),
     memo: z.unknown().optional(),
-    info: z.record(z.unknown()).optional(),
-    customer: z.record(z.unknown()).nullable().optional(),
-    billing_address: z.record(z.unknown()).nullable().optional(),
-    shipping_address: z.record(z.unknown()).nullable().optional(),
-    quote: z.record(z.unknown()).optional(),
-    shipment_method: z.record(z.unknown()).nullable().optional(),
-    payment_method: z.record(z.unknown()).nullable().optional(),
-    discount: z.union([z.boolean(), z.record(z.unknown())]).optional(),
-    discount_code: z.record(z.unknown()).nullable().optional(),
     products: z.array(checkoutProductSchema).optional(),
+    discountCode: z.union([z.string(), z.record(z.unknown()), z.null()]).optional(),
   })
   .passthrough();
 export type Checkout = z.infer<typeof checkoutSchema>;
 
-// input schema for create/update (all fields optional for update)
+// validate result: { validated, errors: [] | { "dotted.snake.key": "message" } }
+// the errors object has dynamic snake/dotted keys — never run fromWire on it.
+export const checkoutValidateSchema = z
+  .object({
+    validated: z.boolean(),
+    errors: z.union([z.array(z.unknown()), z.record(z.string())]),
+  })
+  .passthrough();
+export type CheckoutValidation = z.infer<typeof checkoutValidateSchema>;
+
+// order (finish) result: { order_id, payment_url, payment_provider }
+export const checkoutOrderResultSchema = z
+  .object({
+    orderId: z.number(),
+    paymentUrl: z.string().optional(),
+    paymentProvider: z.string().optional(),
+  })
+  .passthrough();
+export type CheckoutOrderResult = z.infer<typeof checkoutOrderResultSchema>;
+
+// input schema for create (camelCase — what users pass)
 export const checkoutInputSchema = z.object({
-  // customer info
-  customer: z.number().optional(), // customer id to associate
-  email: z.string().optional(),
-  firstname: z.string().optional(),
-  lastname: z.string().optional(),
-  company: z.string().optional(),
-  phone: z.string().optional(),
-  gender: z.string().optional(),
   mode: z.string().optional(),
-  // billing address
-  billing_address: z.record(z.unknown()).optional(),
-  // shipping address
-  shipping_address: z.record(z.unknown()).optional(),
-  // shipment/payment method ids
-  shipment_method_id: z.string().optional(),
-  payment_method_id: z.string().optional(),
-  // misc
+  customer: z.record(z.unknown()).optional(),
+  billingAddress: z.record(z.unknown()).optional(),
+  shippingAddress: z.record(z.unknown()).optional(),
+  shipmentMethod: z.string().optional(),
+  paymentMethod: z
+    .object({ id: z.union([z.string(), z.number()]) })
+    .passthrough()
+    .optional(),
   comment: z.string().optional(),
   newsletter: z.boolean().optional(),
-  terms: z.boolean().optional(),
+  terms: z.union([z.boolean(), z.number()]).optional(),
   notifications: z.boolean().optional(),
-  discount_code: z.string().optional(),
+  discountCode: z.string().optional(),
 });
 export type CheckoutInput = z.input<typeof checkoutInputSchema>;
 
@@ -160,9 +257,11 @@ export class CheckoutProductResource {
     const raw = await this.transport.send<unknown>({
       method: "POST",
       path: `${this.base}.json`,
-      body: parsed.data,
+      body: toWire(parsed.data, CHECKOUT_PRODUCT_MAP),
     });
-    const result = checkoutProductSchema.safeParse(raw);
+    const result = checkoutProductSchema.safeParse(
+      fromWire(raw as Record<string, unknown>, CHECKOUT_PRODUCT_MAP),
+    );
     if (!result.success)
       throw new LightspeedValidationError("invalid checkout product response", result.error.issues);
     return result.data;
@@ -178,9 +277,11 @@ export class CheckoutProductResource {
     const raw = await this.transport.send<unknown>({
       method: "PUT",
       path: `${this.base}/${productId}.json`,
-      body: parsed.data,
+      body: toWire(parsed.data, CHECKOUT_PRODUCT_MAP),
     });
-    const result = checkoutProductSchema.safeParse(raw);
+    const result = checkoutProductSchema.safeParse(
+      fromWire(raw as Record<string, unknown>, CHECKOUT_PRODUCT_MAP),
+    );
     if (!result.success)
       throw new LightspeedValidationError(
         "invalid checkout product update response",
@@ -197,7 +298,7 @@ export class CheckoutProductResource {
 }
 
 // main checkout resource — does NOT extend Resource<T> because the api uses
-// no envelopes and snake_case fields; all methods use direct transport calls
+// no envelopes; all methods use direct transport calls + explicit casing maps
 export class CheckoutResource {
   protected readonly base = "checkouts";
 
@@ -210,7 +311,10 @@ export class CheckoutResource {
       query: q as Record<string, string | number | boolean | undefined>,
     });
     // api returns bare array (no envelope)
-    const parsed = checkoutSchema.array().safeParse(raw);
+    const mapped = (raw as unknown[]).map((o) =>
+      fromWire(o as Record<string, unknown>, CHECKOUT_MAP),
+    );
+    const parsed = checkoutSchema.array().safeParse(mapped);
     if (!parsed.success)
       throw new LightspeedValidationError("invalid checkout list response", parsed.error.issues);
     return parsed.data;
@@ -231,7 +335,7 @@ export class CheckoutResource {
       path: `${this.base}/${id}.json`,
     });
     // api returns direct object (no envelope)
-    const parsed = checkoutSchema.safeParse(raw);
+    const parsed = checkoutSchema.safeParse(fromWire(raw as Record<string, unknown>, CHECKOUT_MAP));
     if (!parsed.success)
       throw new LightspeedValidationError("invalid checkout response", parsed.error.issues);
     return parsed.data;
@@ -244,9 +348,9 @@ export class CheckoutResource {
     const raw = await this.transport.send<unknown>({
       method: "POST",
       path: `${this.base}.json`,
-      body: parsed.data,
+      body: toWire(parsed.data, CHECKOUT_MAP),
     });
-    const result = checkoutSchema.safeParse(raw);
+    const result = checkoutSchema.safeParse(fromWire(raw as Record<string, unknown>, CHECKOUT_MAP));
     if (!result.success)
       throw new LightspeedValidationError("invalid checkout create response", result.error.issues);
     return result.data;
@@ -259,9 +363,9 @@ export class CheckoutResource {
     const raw = await this.transport.send<unknown>({
       method: "PUT",
       path: `${this.base}/${id}.json`,
-      body: parsed.data,
+      body: toWire(parsed.data, CHECKOUT_MAP),
     });
-    const result = checkoutSchema.safeParse(raw);
+    const result = checkoutSchema.safeParse(fromWire(raw as Record<string, unknown>, CHECKOUT_MAP));
     if (!result.success)
       throw new LightspeedValidationError("invalid checkout update response", result.error.issues);
     return result.data;
@@ -276,7 +380,10 @@ export class CheckoutResource {
       method: "GET",
       path: EXCEPTIONS.checkoutShipmentMethods(id),
     });
-    const parsed = checkoutShipmentMethodSchema.array().safeParse(raw);
+    const mapped = (raw as unknown[]).map((o) =>
+      fromWire(o as Record<string, unknown>, SHIPMENT_METHOD_MAP),
+    );
+    const parsed = checkoutShipmentMethodSchema.array().safeParse(mapped);
     if (!parsed.success)
       throw new LightspeedValidationError(
         "invalid checkout shipment methods response",
@@ -291,7 +398,10 @@ export class CheckoutResource {
       method: "GET",
       path: EXCEPTIONS.checkoutPaymentMethods(id),
     });
-    const parsed = checkoutPaymentMethodSchema.array().safeParse(raw);
+    const mapped = (raw as unknown[]).map((o) =>
+      fromWire(o as Record<string, unknown>, PAYMENT_METHOD_MAP),
+    );
+    const parsed = checkoutPaymentMethodSchema.array().safeParse(mapped);
     if (!parsed.success)
       throw new LightspeedValidationError(
         "invalid checkout payment methods response",
@@ -300,20 +410,35 @@ export class CheckoutResource {
     return parsed.data;
   };
 
-  // GET checkouts/{id}/validate.json — response shape undocumented; passthrough
-  validate = (id: number): Promise<unknown> =>
-    this.transport.send({
+  // GET checkouts/{id}/validate.json — { validated, errors }
+  // NOTE: do NOT fromWire the response; the errors map has dynamic dotted/snake
+  // keys (e.g. "shipping_address.address1.required") that must be preserved.
+  validate = async (id: number): Promise<CheckoutValidation> => {
+    const raw = await this.transport.send<unknown>({
       method: "GET",
       path: EXCEPTIONS.checkoutValidate(id),
     });
+    const parsed = checkoutValidateSchema.safeParse(raw);
+    if (!parsed.success)
+      throw new LightspeedValidationError(
+        "invalid checkout validate response",
+        parsed.error.issues,
+      );
+    return parsed.data;
+  };
 
-  // POST checkouts/{id}/order.json — converts checkout to an order.
-  // response shape is undocumented/unverified (checkout api is snake_case, not the camelCase Order);
-  // returned as unknown until validated against a live checkout conversion.
-  order = (id: number, input?: Record<string, unknown>): Promise<unknown> =>
-    this.transport.send({
+  // POST checkouts/{id}/order.json — converts checkout to an order
+  order = async (id: number, input?: Record<string, unknown>): Promise<CheckoutOrderResult> => {
+    const raw = await this.transport.send<unknown>({
       method: "POST",
       path: EXCEPTIONS.checkoutOrder(id),
       body: input,
     });
+    const parsed = checkoutOrderResultSchema.safeParse(
+      fromWire(raw as Record<string, unknown>, ORDER_RESULT_MAP),
+    );
+    if (!parsed.success)
+      throw new LightspeedValidationError("invalid checkout order response", parsed.error.issues);
+    return parsed.data;
+  };
 }
