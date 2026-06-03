@@ -108,7 +108,7 @@ export const checkoutProductSchema = z
     productId: z.number().optional(),
     variantId: z.number().optional(),
     isCustom: z.boolean().nullable().optional(),
-    customChecksum: z.string().nullable().optional(),
+    customChecksum: z.unknown().optional(),
     customData: z.unknown().optional(),
     quantity: z.number().optional(),
     hasDiscount: z.boolean().optional(),
