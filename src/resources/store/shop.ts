@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { resourceRef } from "../../core/fragments";
-import type { Transport } from "../../core/http";
 import { SingletonResource } from "../../core/resource";
+import { MetafieldResource } from "../shared/metafield";
 
 const countrySchema = z
   .object({
@@ -56,6 +56,8 @@ export class ShopResource extends SingletonResource<Shop> {
   protected key = "shop";
 
   get = () => this.get_();
+
+  metafields = () => new MetafieldResource(this.transport, this.base, "shop");
 }
 
 export { ShopResource as default };

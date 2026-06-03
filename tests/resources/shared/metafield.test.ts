@@ -22,6 +22,18 @@ describe("metafieldSchema", () => {
     const m = metafieldSchema.parse({ ...sample, namespace: "my_ns" });
     expect((m as Record<string, unknown>).namespace).toBe("my_ns");
   });
+
+  test("accepts a numeric value (e.g. shop metafield value: 0)", () => {
+    expect(
+      metafieldSchema.safeParse({
+        id: 1,
+        createdAt: "x",
+        updatedAt: "y",
+        key: "k",
+        value: 0,
+      }).success,
+    ).toBe(true);
+  });
 });
 
 describe("MetafieldResource paths", () => {

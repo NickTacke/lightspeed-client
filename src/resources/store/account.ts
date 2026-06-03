@@ -4,6 +4,7 @@ import { LightspeedValidationError } from "../../core/errors";
 import { orFalse, resourceRef } from "../../core/fragments";
 import type { Transport } from "../../core/http";
 import { SingletonResource } from "../../core/resource";
+import { MetafieldResource } from "../shared/metafield";
 
 export const accountSchema = z
   .object({
@@ -56,6 +57,8 @@ export class AccountResource extends SingletonResource<Account> {
   protected key = "account";
 
   get = () => this.get_();
+
+  metafields = () => new MetafieldResource(this.transport, this.base, "account");
 
   permissions = async (): Promise<AccountPermissions> => {
     const raw = await this.transport.send<Record<string, unknown>>({

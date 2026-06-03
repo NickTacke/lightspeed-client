@@ -38,6 +38,14 @@ maybe("live: shop.get returns shop shape", async () => {
   expect(typeof s.currency.shortcode).toBe("string");
 });
 
+maybe("live: shop.metafields().list returns an array", async () => {
+  expect(Array.isArray(await makeClient().shop.metafields().list())).toBe(true);
+});
+
+maybe("live: account.metafields().list returns an array", async () => {
+  expect(Array.isArray(await makeClient().account.metafields().list())).toBe(true);
+});
+
 maybe("live: webhooks.list returns an array", async () => {
   const ws = await makeClient().webhooks.list();
   expect(Array.isArray(ws)).toBe(true);
