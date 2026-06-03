@@ -118,7 +118,7 @@ export const quoteSchema = timestamps
     colli: z.number().optional(),
     paymentCountry: orFalse(countryObject).optional(),
     shipmentCountry: orFalse(countryObject).optional(),
-    shipmentZipcode: z.string().optional(),
+    shipmentZipcode: z.string().nullable().optional(),
     shipmentSameAddress: z.boolean().optional(),
     priceCost: z.number().optional(),
     priceExcl: z.number().optional(),
