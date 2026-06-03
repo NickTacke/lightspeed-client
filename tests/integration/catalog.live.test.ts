@@ -128,6 +128,11 @@ maybe("live: attributes.count returns a number", async () => {
   expect(typeof count).toBe("number");
 });
 
+maybe("live: attributes.create then schema parses (no timestamps)", async () => {
+  const a = await makeClient().attributes.create({ title: "QA Attr" });
+  expect(typeof a.id).toBe("number");
+});
+
 maybe("live: typeAttributes.list parses", async () => {
   const ta = await makeClient().typeAttributes.list({ type: 252474 });
   expect(Array.isArray(ta)).toBe(true);

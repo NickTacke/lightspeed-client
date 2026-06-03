@@ -5,23 +5,26 @@ import {
   attributeUpdateSchema,
 } from "../../../src/resources/catalog/attribute";
 
-// NOTE: live shop has no attributes — schema modelled from docs
-// live: GET /nl/attributes.json returns {"attributes": []}
+// live attribute shape (create + list): no createdAt/updatedAt
 const sample = {
   id: 1,
-  createdAt: "2026-01-01T00:00:00+00:00",
-  updatedAt: "2026-01-01T00:00:00+00:00",
   title: "Color",
-  type: "select",
-  isRequired: false,
-  position: 1,
+  defaultValue: "",
+  types: {
+    resource: {
+      id: false,
+      url: "https://api.webshopapp.com/nl/attributes/1/types.json",
+      link: "https://api.webshopapp.com/nl/attributes/1/types.json",
+    },
+  },
 };
 
-test("attributeSchema parses a minimal attribute object", () => {
+test("attributeSchema parses a live attribute object (no timestamps)", () => {
   const a = attributeSchema.parse(sample);
   expect(a.id).toBe(1);
   expect(a.title).toBe("Color");
-  expect(a.type).toBe("select");
+  expect(a.defaultValue).toBe("");
+  expect(a.types?.resource.id).toBe(false);
 });
 
 test("attributeUpdateSchema allows partial update without title", () => {
