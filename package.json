@@ -1,6 +1,6 @@
 {
   "name": "lightspeed-client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "typescript client for the lightspeed ecom (c-series) api",
   "type": "module",
   "license": "MIT",
