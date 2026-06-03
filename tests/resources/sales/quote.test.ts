@@ -21,27 +21,40 @@ class FakeTransport {
 }
 
 const sample = {
-  id: 2001,
+  id: 1501464656,
   createdAt: "2026-01-01T00:00:00+00:00",
-  updatedAt: "2026-01-01T00:00:00+00:00",
-  status: "open",
-  email: "user@example.com",
-  firstname: "Jane",
-  lastname: "Smith",
-  priceIncl: 99.0,
-  customer: false,
+  updatedAt: "2026-01-02T00:00:00+00:00",
+  productsQuantity: 1,
+  paymentCountry: { id: 150, code: "nl", code3: "nld", title: "Netherlands, The" },
+  shipmentId: "core|747283|3298308",
+  customer: { resource: { id: 226983112, url: "x", link: "y" } },
 };
 
-test("quoteSchema parses a docs-derived sample", () => {
+test("quoteSchema parses the live-shaped fixture", () => {
   const q = quoteSchema.parse(sample);
-  expect(q.id).toBe(2001);
-  expect(q.status).toBe("open");
+  expect(q.id).toBe(1501464656);
+  expect(q.productsQuantity).toBe(1);
+  expect(
+    (q.paymentCountry as { code: string } | false | undefined) !== false &&
+      (q.paymentCountry as { code: string })?.code,
+  ).toBe("nl");
+});
+
+test("quoteSchema: customer false still accepted", () => {
+  const q = quoteSchema.parse({ ...sample, customer: false });
   expect(q.customer).toBe(false);
 });
 
 test("quoteSchema preserves unknown fields via passthrough", () => {
   const q = quoteSchema.parse({ ...sample, extra: "x" });
   expect((q as Record<string, unknown>).extra).toBe("x");
+});
+
+test("quoteSchema: country code parses correctly", () => {
+  const q = quoteSchema.parse(sample);
+  const country = q.paymentCountry as { id: number; code: string; code3: string; title: string };
+  expect(country.code).toBe("nl");
+  expect(country.id).toBe(150);
 });
 
 test("QuoteResource hits quotes.json with quotes envelope on list", async () => {

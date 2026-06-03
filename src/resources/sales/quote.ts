@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { orFalse, resourceRef, timestamps } from "../../core/fragments";
+import { countryObject, orFalse, resourceRef, timestamps } from "../../core/fragments";
 import type { Transport } from "../../core/http";
 import { Resource } from "../../core/resource";
 
@@ -102,36 +102,43 @@ export class QuotePaymentMethodResource extends Resource<QuotePaymentMethod> {
   count = (q?: Record<string, unknown>) => this.count_(q);
 }
 
-// docs-derived schema (unvalidated live)
+// live-validated: confirmed against quote 1501464656 (embedded in seeded order)
 export const quoteSchema = timestamps
   .extend({
     id: z.number(),
-    status: z.string().optional(),
-    customerId: z.number().nullable().optional(),
-    firstname: z.string().optional(),
-    lastname: z.string().optional(),
-    company: z.string().optional(),
-    email: z.string().optional(),
-    phone: z.string().optional(),
-    gender: z.string().optional(),
-    remark: z.string().optional(),
-    addressBillingStreet: z.string().optional(),
-    addressBillingStreet2: z.string().optional(),
-    addressBillingNumber: z.string().optional(),
-    addressBillingZipcode: z.string().optional(),
-    addressBillingCity: z.string().optional(),
-    addressBillingRegion: z.string().optional(),
-    addressBillingCountry: z.string().optional(),
-    addressShippingStreet: z.string().optional(),
-    addressShippingStreet2: z.string().optional(),
-    addressShippingNumber: z.string().optional(),
-    addressShippingZipcode: z.string().optional(),
-    addressShippingCity: z.string().optional(),
-    addressShippingRegion: z.string().optional(),
-    addressShippingCountry: z.string().optional(),
+    recalculatedAt: z.string().nullable().optional(),
+    isLocked: z.boolean().optional(),
+    channel: z.string().optional(),
+    recoveryHash: z.string().optional(),
+    remoteIp: z.string().optional(),
+    userAgent: z.string().optional(),
+    referralId: z.union([z.string(), z.literal(false)]).optional(),
+    weight: z.number().optional(),
+    volume: z.number().optional(),
+    colli: z.number().optional(),
+    paymentCountry: orFalse(countryObject).optional(),
+    shipmentCountry: orFalse(countryObject).optional(),
+    shipmentZipcode: z.string().optional(),
+    shipmentSameAddress: z.boolean().optional(),
+    priceCost: z.number().optional(),
     priceExcl: z.number().optional(),
     priceIncl: z.number().optional(),
+    discountExcl: z.number().optional(),
+    discountIncl: z.number().optional(),
+    productsCount: z.number().optional(),
+    productsQuantity: z.number().optional(),
+    shipmentId: z.union([z.string(), z.literal(false)]).optional(),
+    shipmentIsSet: z.boolean().optional(),
+    shipmentTitle: z.string().optional(),
+    paymentId: z.union([z.string(), z.literal(false)]).optional(),
+    paymentIsSet: z.boolean().optional(),
+    paymentTitle: z.string().optional(),
+    discountIsSet: z.boolean().optional(),
+    discountCouponCode: z.string().optional(),
+    comment: z.string().nullable().optional(),
+    allowNotifications: z.boolean().optional(),
     customer: orFalse(resourceRef).optional(),
+    language: z.record(z.unknown()).optional(),
     products: resourceRef.optional(),
     shippingmethods: resourceRef.optional(),
     paymentmethods: resourceRef.optional(),
