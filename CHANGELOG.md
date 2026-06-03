@@ -1,5 +1,11 @@
 # lightspeed-client
 
+## 0.2.1
+
+### Patch Changes
+
+- a7c6840: fix customer and variant-movement schemas against live data: customer addressBilling/ShippingCountry are country objects (not strings), and variant movements have no updatedAt. previously customers.list/get and variantMovements.list threw on real data.
+
 ## 0.2.0
 
 ### Minor Changes
