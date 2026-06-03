@@ -83,6 +83,22 @@ const ORDER_RESULT_MAP = {
   paymentProvider: "payment_provider",
 } as const satisfies FieldMap;
 
+// the checkout object embeds sub-objects that fromWire (shallow) would leave
+// snake_case; re-case the known nested structures so the typed camelCase
+// surface is fully populated.
+function normalizeCheckout(raw: unknown): Record<string, unknown> {
+  const o = fromWire(raw as Record<string, unknown>, CHECKOUT_MAP);
+  if (o.shipmentMethod && typeof o.shipmentMethod === "object")
+    o.shipmentMethod = fromWire(o.shipmentMethod as Record<string, unknown>, SHIPMENT_METHOD_MAP);
+  if (o.paymentMethod && typeof o.paymentMethod === "object")
+    o.paymentMethod = fromWire(o.paymentMethod as Record<string, unknown>, PAYMENT_METHOD_MAP);
+  if (Array.isArray(o.products))
+    o.products = o.products.map((p) =>
+      fromWire(p as Record<string, unknown>, CHECKOUT_PRODUCT_MAP),
+    );
+  return o;
+}
+
 export const checkoutProductSchema = z
   .object({
     id: z.number(),
@@ -315,9 +331,7 @@ export class CheckoutResource {
       query: q as Record<string, string | number | boolean | undefined>,
     });
     // api returns bare array (no envelope)
-    const mapped = (raw as unknown[]).map((o) =>
-      fromWire(o as Record<string, unknown>, CHECKOUT_MAP),
-    );
+    const mapped = (raw as unknown[]).map((o) => normalizeCheckout(o));
     const parsed = checkoutSchema.array().safeParse(mapped);
     if (!parsed.success)
       throw new LightspeedValidationError("invalid checkout list response", parsed.error.issues);
@@ -339,7 +353,7 @@ export class CheckoutResource {
       path: `${this.base}/${id}.json`,
     });
     // api returns direct object (no envelope)
-    const parsed = checkoutSchema.safeParse(fromWire(raw as Record<string, unknown>, CHECKOUT_MAP));
+    const parsed = checkoutSchema.safeParse(normalizeCheckout(raw));
     if (!parsed.success)
       throw new LightspeedValidationError("invalid checkout response", parsed.error.issues);
     return parsed.data;
@@ -354,7 +368,7 @@ export class CheckoutResource {
       path: `${this.base}.json`,
       body: toWire(parsed.data, CHECKOUT_MAP),
     });
-    const result = checkoutSchema.safeParse(fromWire(raw as Record<string, unknown>, CHECKOUT_MAP));
+    const result = checkoutSchema.safeParse(normalizeCheckout(raw));
     if (!result.success)
       throw new LightspeedValidationError("invalid checkout create response", result.error.issues);
     return result.data;
@@ -369,7 +383,7 @@ export class CheckoutResource {
       path: `${this.base}/${id}.json`,
       body: toWire(parsed.data, CHECKOUT_MAP),
     });
-    const result = checkoutSchema.safeParse(fromWire(raw as Record<string, unknown>, CHECKOUT_MAP));
+    const result = checkoutSchema.safeParse(normalizeCheckout(raw));
     if (!result.success)
       throw new LightspeedValidationError("invalid checkout update response", result.error.issues);
     return result.data;

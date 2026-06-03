@@ -114,6 +114,29 @@ test("CheckoutResource.get GETs checkouts/{id}.json and returns camelCase", asyn
   expect(t.calls[0]).toMatchObject({ method: "GET", path: "checkouts/3628565.json" });
 });
 
+test("get re-cases nested shipment/payment method and products to camelCase", async () => {
+  const wire = {
+    id: 1,
+    created_at: "x",
+    order_id: null,
+    shipment_method: { id: "core|1|1", price_incl: 5, tax_rate: 0.21, is_service_point: false },
+    payment_method: { id: "pickup", post_payment: true, price_incl: 0 },
+    products: [{ id: 9, variant_id: 7, price_incl: 5, article_code: "A1" }],
+  };
+  const t = new FakeTransport(() => wire);
+  // biome-ignore lint/suspicious/noExplicitAny: test fake cast
+  const r = new CheckoutResource(t as any);
+  const co = await r.get(1);
+  expect(co.shipmentMethod?.priceIncl).toBe(5);
+  expect(co.shipmentMethod?.isServicePoint).toBe(false);
+  expect(co.paymentMethod?.postPayment).toBe(true);
+  expect(co.products?.[0]?.variantId).toBe(7);
+  expect(co.products?.[0]?.priceIncl).toBe(5);
+  // snake keys must be gone from the nested objects
+  expect(co.shipmentMethod).not.toHaveProperty("price_incl");
+  expect(co.products?.[0]).not.toHaveProperty("variant_id");
+});
+
 test("CheckoutResource.create POSTs camelCase input as snake wire body", async () => {
   const t = new FakeTransport(() => wireCheckout);
   // biome-ignore lint/suspicious/noExplicitAny: test fake cast
