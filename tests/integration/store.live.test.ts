@@ -42,3 +42,8 @@ maybe("live: webhooks.list returns an array", async () => {
   const ws = await makeClient().webhooks.list();
   expect(Array.isArray(ws)).toBe(true);
 });
+
+maybe("live: webhooks.get parses the seeded webhook", async () => {
+  const w = await makeClient().webhooks.get(4745101);
+  expect(w.itemGroup).toBe("products");
+});

@@ -5,26 +5,26 @@ import {
   webhookUpdateSchema,
 } from "../../../src/resources/store/webhook";
 
-// docs-derived sample (live webhooks.json is empty array on test shop)
+// live-confirmed sample (GET webhooks/{id}.json) — no url/secret/extra
 const sample = {
-  id: 1,
+  id: 4745101,
   createdAt: "2026-01-01T00:00:00+00:00",
   updatedAt: "2026-01-01T00:00:00+00:00",
   isActive: true,
-  url: "https://example.com/webhook",
-  format: "json",
-  itemGroup: "orders",
+  itemGroup: "products",
   itemAction: "created",
-  secret: "abc123",
-  extra: "",
+  language: { id: 1, code: "nl", locale: "nl_NL", title: "Nederlands" },
+  format: "json",
+  address: "https://example.com/hook",
 };
 
-test("webhookSchema parses a webhook fixture", () => {
+test("webhookSchema parses a live webhook fixture", () => {
   const w = webhookSchema.parse(sample);
-  expect(w.id).toBe(1);
+  expect(w.id).toBe(4745101);
   expect(w.format).toBe("json");
-  expect(w.itemGroup).toBe("orders");
+  expect(w.itemGroup).toBe("products");
   expect(w.itemAction).toBe("created");
+  expect(w.address).toBe("https://example.com/hook");
 });
 
 test("webhookSchema accepts wildcard itemAction", () => {

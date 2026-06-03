@@ -1,19 +1,21 @@
 import { z } from "zod";
 import { WebhookFormat, WebhookItemAction, WebhookItemGroup } from "../../constants/enums";
-import { timestamps } from "../../core/fragments";
-import type { Transport } from "../../core/http";
 import { Resource } from "../../core/resource";
 
-export const webhookSchema = timestamps
-  .extend({
+// live-confirmed shape (GET webhooks/{id}.json). response stays tolerant:
+// itemGroup/itemAction/format are plain strings since webhooks span many
+// group/action combos. docs-only fields (url/secret/extra) are not present live.
+export const webhookSchema = z
+  .object({
     id: z.number(),
-    isActive: z.boolean(),
-    url: z.string(),
-    format: z.nativeEnum(WebhookFormat),
-    itemGroup: z.nativeEnum(WebhookItemGroup),
-    itemAction: z.nativeEnum(WebhookItemAction),
-    secret: z.string(),
-    extra: z.string(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+    isActive: z.boolean().optional(),
+    itemGroup: z.string().optional(),
+    itemAction: z.string().optional(),
+    format: z.string().optional(),
+    address: z.string().optional(),
+    language: z.record(z.unknown()).optional(),
   })
   .passthrough();
 export type Webhook = z.infer<typeof webhookSchema>;

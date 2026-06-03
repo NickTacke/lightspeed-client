@@ -97,7 +97,16 @@ maybe("live: brands.count returns a number", async () => {
   expect(typeof count).toBe("number");
 });
 
-// types (empty on test shop, but count should work)
+// types (seeded on test shop)
+maybe("live: types.get parses the seeded type", async () => {
+  const t = await makeClient().types.get(252474);
+  expect(t.id).toBe(252474);
+});
+
+maybe("live: types.list parses", async () => {
+  expect(Array.isArray(await makeClient().types.list({ limit: 5 }))).toBe(true);
+});
+
 maybe("live: types.list returns an array", async () => {
   const items = await makeClient().types.list({ limit: 1 });
   expect(Array.isArray(items)).toBe(true);

@@ -32,3 +32,8 @@ maybe("live: groups.count returns a number", async () => {
   const count = await makeClient().groups.count();
   expect(typeof count).toBe("number");
 });
+
+maybe("live: groups.get parses the seeded group", async () => {
+  const g = await makeClient().groups.get(69094);
+  expect(g.id).toBe(69094);
+});
