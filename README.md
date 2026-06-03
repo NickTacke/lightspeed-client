@@ -167,6 +167,16 @@ const images = await client.products.images(productId).list();
 const mf = await client.products.metafields(productId).list();
 await client.products.metafields(productId).create({ key: "colour", value: "red" });
 
+// product relations / filter values / attributes
+const relations = await client.products.relations(productId).list();
+const filterValues = await client.products.filterValues(productId).list();
+// attributes are derived from the product's type (list/get/update/delete, no create)
+const attrs = await client.products.attributes(productId).list();
+
+// metafields on the shop / account singletons (no id arg)
+const shopMf = await client.shop.metafields().list();
+const accountMf = await client.account.metafields().list();
+
 // order products (line items)
 const lineItems = await client.orders.products(orderId).list();
 
@@ -187,6 +197,13 @@ const sp = await client.shipments.products(shipmentId).list();
 // checkout products / methods (camelCase, like the rest of the client)
 await client.checkouts.products(checkoutId).add({ variantId: 1, quantity: 2 });
 const methods = await client.checkouts.shipmentMethods(checkoutId);
+
+// validate, then convert a checkout to an order (both return typed results)
+const validation = await client.checkouts.validate(checkoutId); // CheckoutValidation
+if (validation.validated) {
+  const result = await client.checkouts.order(checkoutId);      // CheckoutOrderResult
+  console.log(result.orderId);
+}
 ```
 
 ---
@@ -223,14 +240,16 @@ console.log(brand.brand.title);
 
 | accessor | resource |
 |---|---|
-| `client.products` | Products (+ `.images(id)`, `.metafields(id)`) |
+| `client.products` | Products (+ `.images(id)`, `.metafields(id)`, `.relations(id)`, `.filterValues(id)`, `.attributes(id)`) |
 | `client.variants` | Variants |
 | `client.variantMovements` | Variant stock movements |
 | `client.categories` | Categories |
 | `client.brands` | Brands |
 | `client.types` | Product types |
+| `client.typeAttributes` | Type-attribute links |
 | `client.attributes` | Attributes |
 | `client.tags` | Tags |
+| `client.quantityDiscounts` | Quantity discounts (filters: `product`, `variant`) |
 
 ### Sales
 
@@ -238,6 +257,7 @@ console.log(brand.brand.title);
 |---|---|
 | `client.orders` | Orders (+ `.products(id)`) |
 | `client.orderEvents` | Order events |
+| `client.orderCustomStatuses` | Order custom statuses |
 | `client.quotes` | Quotes (+ `.products(id)`, `.shipmentMethods(id)`, `.paymentMethods(id)`) |
 | `client.invoices` | Invoices (+ `.items(id)`) |
 | `client.shipments` | Shipments (+ `.products(id)`) |
@@ -255,8 +275,8 @@ console.log(brand.brand.title);
 
 | accessor | resource |
 |---|---|
-| `client.account` | Account (singleton) |
-| `client.shop` | Shop (singleton) |
+| `client.account` | Account (singleton) (+ `.metafields()`) |
+| `client.shop` | Shop (singleton) (+ `.metafields()`) |
 | `client.webhooks` | Webhooks |
 
 ### Join tables
@@ -269,20 +289,14 @@ console.log(brand.brand.title);
 
 ### Roadmap / not yet covered
 
-The following are not yet implemented and fall through to `client.request`:
+The following top-level resources are not yet implemented and fall through to `client.request`. They are grouped by the themes targeted for v0.3.0+:
 
-- Blog posts and pages
-- Support tickets
-- Product reviews
-- Discounts and coupon codes
-- Catalog filters
-- Subscriptions
-- Shipping and payment method configuration
-- Delivery dates
-- Supplier management
-- Template / theme endpoints
+- **Content** — Blog posts and pages, Text pages, File / theme assets, Themes, Redirects
+- **Merchandising** — Product reviews, Discounts and coupon codes, top-level Filters / filter values, Sets, Catalog feed
+- **Config** — Tax, Shipping- and payment-method configuration, Delivery dates, Suppliers, External services, Subscriptions, Country / Language / Time
+- **Support** — Support tickets, Contacts, Dashboard, Events
 
-Schemas for resources without live test data are derived from the Lightspeed eCom API documentation; field presence may vary by plan or shop configuration.
+All shipped schemas in this release are live-validated against a real Lightspeed eCom shop. Schemas for resources without live test data are derived from the Lightspeed eCom API documentation; field presence may vary by plan or shop configuration.
 
 ---
 

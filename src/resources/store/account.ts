@@ -2,7 +2,6 @@ import { z } from "zod";
 import { EXCEPTIONS } from "../../core/endpoints";
 import { LightspeedValidationError } from "../../core/errors";
 import { orFalse, resourceRef } from "../../core/fragments";
-import type { Transport } from "../../core/http";
 import { SingletonResource } from "../../core/resource";
 import { MetafieldResource } from "../shared/metafield";
 
