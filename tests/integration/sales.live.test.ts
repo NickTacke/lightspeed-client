@@ -106,3 +106,13 @@ maybe("live: orderEvents.list parses real events for the order", async () => {
   expect(events.length).toBeGreaterThan(0);
   expect(typeof events[0]?.type).toBe("string");
 });
+
+maybe("live: invoices.get parses the seeded invoice", async () => {
+  const inv = await makeClient().invoices.get(332615050);
+  expect(inv.number).toBe("INV00001");
+});
+
+maybe("live: shipments.get parses the seeded shipment", async () => {
+  const sh = await makeClient().shipments.get(305761114);
+  expect(sh.number).toBe("SHIP00001");
+});
