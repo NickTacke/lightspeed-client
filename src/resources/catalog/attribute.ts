@@ -1,17 +1,17 @@
 import { z } from "zod";
-import { timestamps } from "../../core/fragments";
+import { resourceRef } from "../../core/fragments";
 import { Resource } from "../../core/resource";
 
-// live shop has no attributes; schema inferred from docs
 // attributes describe product options (e.g. color, size)
-export const attributeSchema = timestamps
-  .extend({
+// live responses (create + list) omit createdAt/updatedAt
+export const attributeSchema = z
+  .object({
     id: z.number(),
-    title: z.string(),
-    // type of attribute input (text, select, etc)
-    type: z.string().optional(),
-    isRequired: z.boolean().optional(),
-    position: z.number().optional(),
+    title: z.string().optional(),
+    defaultValue: z.string().nullable().optional(),
+    types: resourceRef.optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
   })
   .passthrough();
 export type Attribute = z.infer<typeof attributeSchema>;
