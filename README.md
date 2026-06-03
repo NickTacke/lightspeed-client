@@ -184,8 +184,8 @@ const items = await client.invoices.items(invoiceId).list();
 // shipment products
 const sp = await client.shipments.products(shipmentId).list();
 
-// checkout products / methods (checkout api uses snake_case fields)
-await client.checkouts.products(checkoutId).add({ variant_id: 1, quantity: 2 });
+// checkout products / methods (camelCase, like the rest of the client)
+await client.checkouts.products(checkoutId).add({ variantId: 1, quantity: 2 });
 const methods = await client.checkouts.shipmentMethods(checkoutId);
 ```
 
@@ -242,7 +242,7 @@ console.log(brand.brand.title);
 | `client.invoices` | Invoices (+ `.items(id)`) |
 | `client.shipments` | Shipments (+ `.products(id)`) |
 | `client.returns` | Returns |
-| `client.checkouts` | Checkouts — snake_case v2 API (+ `.products(id)`, `.shipmentMethods(id)`, `.paymentMethods(id)`, `.validate(id)`, `.order(id)`) |
+| `client.checkouts` | Checkouts — camelCase, no envelopes (bare arrays) (+ `.products(id)`, `.shipmentMethods(id)`, `.paymentMethods(id)`, `.validate(id)`, `.order(id)`) |
 
 ### Customers
 

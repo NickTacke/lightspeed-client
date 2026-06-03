@@ -109,6 +109,8 @@ export type {
   CheckoutProductUpdate,
   CheckoutShipmentMethod,
   CheckoutPaymentMethod,
+  CheckoutValidation,
+  CheckoutOrderResult,
 } from "./resources/sales/checkout";
 export { CustomerResource } from "./resources/customers/customer";
 export type {
