@@ -12,5 +12,5 @@ jobs:
       - run: bun install
       - run: npm install -g npm@latest
       - uses: changesets/action@v1
-        with: { publish: bun run release, version: bunx changeset version && bunx biome format --write package.json }
+        with: { publish: bun run release, version: bun run ci:version }
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
