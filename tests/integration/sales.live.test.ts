@@ -88,3 +88,21 @@ maybe("live: checkouts.count returns a number", async () => {
   const count = await makeClient().checkouts.count();
   expect(typeof count).toBe("number");
 });
+
+maybe("live: orders.get parses the seeded order (ORD00001)", async () => {
+  const order = await makeClient().orders.get(315967958);
+  expect(order.number).toBe("ORD00001");
+  expect(order.id).toBe(315967958);
+});
+
+maybe("live: orders.products(id).list parses order products", async () => {
+  const items = await makeClient().orders.products(315967958).list();
+  expect(items.length).toBeGreaterThan(0);
+  expect(typeof items[0]?.quantityOrdered).toBe("number");
+});
+
+maybe("live: orderEvents.list parses real events for the order", async () => {
+  const events = await makeClient().orderEvents.list({ order: 315967958 });
+  expect(events.length).toBeGreaterThan(0);
+  expect(typeof events[0]?.type).toBe("string");
+});

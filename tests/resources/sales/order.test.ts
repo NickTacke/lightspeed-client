@@ -21,29 +21,36 @@ class FakeTransport {
   }
 }
 
-// docs-derived sample (no live orders in test shop)
 const sample = {
-  id: 1001,
-  createdAt: "2026-01-01T00:00:00+00:00",
-  updatedAt: "2026-01-01T00:00:00+00:00",
-  number: 1001,
-  status: "processing_awaiting_shipment",
-  paymentStatus: "paid",
+  id: 315967958,
+  createdAt: "2026-06-03T00:56:12+02:00",
+  updatedAt: "2026-06-03T00:56:15+02:00",
+  number: "ORD00001",
+  status: "processing_awaiting_pickup",
+  paymentStatus: "not_paid",
   shipmentStatus: "not_shipped",
-  firstname: "John",
-  lastname: "Doe",
-  email: "john@example.com",
-  priceIncl: 49.99,
-  customer: false,
+  customStatusId: null,
+  channel: "api",
+  priceCost: 1.25,
+  priceExcl: 2.88,
+  priceIncl: 3.49,
+  weight: 0,
+  email: "buyer1@example.com",
+  firstname: "Test",
+  lastname: "Buyer",
+  addressBillingCountry: { id: 150, code: "nl", code3: "nld", title: "Netherlands, The" },
+  addressShippingCompany: false,
+  paymentId: "pickup",
+  shipmentId: "core|747283|3298308",
+  customer: { resource: { id: 226983112, url: "customers/226983112", link: "x" } },
 };
 
-test("orderSchema parses a docs-derived order sample", () => {
+test("orderSchema parses the live order shape", () => {
   const o = orderSchema.parse(sample);
-  expect(o.id).toBe(1001);
-  expect(o.status).toBe("processing_awaiting_shipment");
-  expect(o.paymentStatus).toBe("paid");
-  expect(o.shipmentStatus).toBe("not_shipped");
-  expect(o.customer).toBe(false);
+  expect(o.number).toBe("ORD00001");
+  expect(o.status).toBe("processing_awaiting_pickup");
+  expect((o.addressBillingCountry as { code: string }).code).toBe("nl");
+  expect(o.shipmentId).toBe("core|747283|3298308");
 });
 
 test("orderSchema preserves unknown fields via passthrough", () => {
@@ -73,9 +80,9 @@ test("OrderResource.get hits orders/{id}.json", async () => {
   const t = new FakeTransport(() => ({ order: sample }));
   // biome-ignore lint/suspicious/noExplicitAny: test fake cast
   const r = new OrderResource(t as any);
-  const o = await r.get(1001);
-  expect(o.id).toBe(1001);
-  expect(t.calls[0]).toMatchObject({ method: "GET", path: "orders/1001.json" });
+  const o = await r.get(315967958);
+  expect(o.id).toBe(315967958);
+  expect(t.calls[0]).toMatchObject({ method: "GET", path: "orders/315967958.json" });
 });
 
 test("OrderResource.products(id) returns OrderProductResource scoped to orders/{id}/products", async () => {
