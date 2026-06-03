@@ -1,25 +1,22 @@
 import { expect, test } from "bun:test";
 import { typeInputSchema, typeSchema, typeUpdateSchema } from "../../../src/resources/catalog/type";
 
-// NOTE: live shop has no types — schema modelled from docs; passthrough covers undoc fields
-// live: GET /nl/types.json returns {"types": []}
+// live-confirmed sample (GET types/{id}.json): no createdAt/updatedAt
 const sample = {
-  id: 1,
-  createdAt: "2026-01-01T00:00:00+00:00",
-  updatedAt: "2026-01-01T00:00:00+00:00",
+  id: 252474,
   title: "Electronics",
-  products: {
+  attributes: {
     resource: {
       id: false,
-      url: "products?type=1",
-      link: "https://api.webshopapp.com/nl/products.json?type=1",
+      url: "types/attributes?type=252474",
+      link: "https://api.webshopapp.com/nl/types/attributes.json?type=252474",
     },
   },
 };
 
-test("typeSchema parses a minimal type object", () => {
+test("typeSchema parses a live type object without timestamps", () => {
   const t = typeSchema.parse(sample);
-  expect(t.id).toBe(1);
+  expect(t.id).toBe(252474);
   expect(t.title).toBe("Electronics");
 });
 

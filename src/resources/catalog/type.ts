@@ -1,15 +1,16 @@
 import { z } from "zod";
-import { resourceRef, timestamps } from "../../core/fragments";
+import { resourceRef } from "../../core/fragments";
 import { Resource } from "../../core/resource";
 
-// live shop has no types; schema inferred from docs
-// passthrough preserves any undocumented fields
-export const typeSchema = timestamps
-  .extend({
+// live-confirmed shape (GET types/{id}.json): only id, title, attributes.
+// timestamps are absent on live types, so they stay optional.
+export const typeSchema = z
+  .object({
     id: z.number(),
-    title: z.string(),
-    // products sub-resource link appears on most catalog entities
-    products: resourceRef.optional(),
+    title: z.string().optional(),
+    attributes: resourceRef.optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
   })
   .passthrough();
 export type Type = z.infer<typeof typeSchema>;
