@@ -53,3 +53,26 @@ maybe("live: products.metafields(id).list returns metafields", async () => {
   const mfs = await c.products.metafields(first.id).list();
   expect(Array.isArray(mfs)).toBe(true);
 });
+
+maybe("live: products.relations(id).list parses", async () => {
+  const rels = await makeClient().products.relations(163090479).list();
+  expect(rels.length).toBeGreaterThan(0);
+});
+
+maybe("live: products.filterValues(id).list parses", async () => {
+  expect(Array.isArray(await makeClient().products.filterValues(163090479).list())).toBe(true);
+});
+
+maybe("live: products.attributes(id).list parses", async () => {
+  expect(Array.isArray(await makeClient().products.attributes(163090479).list())).toBe(true);
+});
+
+maybe("live: quantityDiscounts.list parses", async () => {
+  const qd = await makeClient().quantityDiscounts.list({ product: 163090479 });
+  expect(Array.isArray(qd)).toBe(true);
+});
+
+maybe("live: quantityDiscounts.get parses", async () => {
+  const qd = await makeClient().quantityDiscounts.get(4107909);
+  expect(qd.id).toBe(4107909);
+});

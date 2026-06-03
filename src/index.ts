@@ -29,6 +29,29 @@ export type {
   VariantMovement,
   VariantMovementFilters,
 } from "./resources/catalog/variant";
+export { ProductRelationResource } from "./resources/catalog/product-relation";
+export type {
+  ProductRelation,
+  ProductRelationInput,
+  ProductRelationUpdate,
+} from "./resources/catalog/product-relation";
+export { ProductFilterValueResource } from "./resources/catalog/product-filter-value";
+export type {
+  ProductFilterValue,
+  ProductFilterValueInput,
+} from "./resources/catalog/product-filter-value";
+export { ProductAttributeResource } from "./resources/catalog/product-attribute";
+export type {
+  ProductAttribute,
+  ProductAttributeUpdate,
+} from "./resources/catalog/product-attribute";
+export { QuantityDiscountResource } from "./resources/catalog/quantity-discount";
+export type {
+  QuantityDiscount,
+  QuantityDiscountInput,
+  QuantityDiscountUpdate,
+  QuantityDiscountFilters,
+} from "./resources/catalog/quantity-discount";
 export { CategoryResource } from "./resources/catalog/category";
 export type {
   Category,

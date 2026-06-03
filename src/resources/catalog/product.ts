@@ -5,6 +5,9 @@ import type { Transport } from "../../core/http";
 import { Resource } from "../../core/resource";
 import { ImageCollectionResource } from "../shared/image";
 import { MetafieldResource } from "../shared/metafield";
+import { ProductAttributeResource } from "./product-attribute";
+import { ProductFilterValueResource } from "./product-filter-value";
+import { ProductRelationResource } from "./product-relation";
 
 export const productSchema = timestamps
   .extend({
@@ -88,6 +91,10 @@ export class ProductResource extends Resource<Product> {
     new ImageCollectionResource(this.transport, `${this.base}/${id}`, this.singular);
   metafields = (id: number) =>
     new MetafieldResource(this.transport, `${this.base}/${id}`, this.singular);
+  relations = (id: number) => new ProductRelationResource(this.transport, `${this.base}/${id}`);
+  filterValues = (id: number) =>
+    new ProductFilterValueResource(this.transport, `${this.base}/${id}`);
+  attributes = (id: number) => new ProductAttributeResource(this.transport, `${this.base}/${id}`);
 }
 
 export { ProductResource as default };
