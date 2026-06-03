@@ -50,7 +50,7 @@ export const shipmentSchema = timestamps
     doNotifyShipped: z.boolean().optional(),
     doNotifyReadyForPickup: z.boolean().optional(),
     doNotifyTrackingCode: z.boolean().optional(),
-    customer: resourceRef.optional(),
+    customer: orFalse(resourceRef).optional(),
     order: resourceRef.optional(),
     products: resourceRef.optional(),
     metafields: resourceRef.optional(),

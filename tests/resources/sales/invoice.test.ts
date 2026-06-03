@@ -67,6 +67,12 @@ test("invoiceSchema parses a live-shaped sample", () => {
   expect(inv.status).toBe("not_paid");
 });
 
+test("invoiceSchema accepts customer: false (customer-less invoice)", () => {
+  expect(
+    invoiceSchema.safeParse({ id: 1, createdAt: "x", updatedAt: "y", customer: false }).success,
+  ).toBe(true);
+});
+
 test("invoiceSchema preserves unknown fields via passthrough", () => {
   const inv = invoiceSchema.parse({ ...sample, extra: "x" });
   expect((inv as Record<string, unknown>).extra).toBe("x");
