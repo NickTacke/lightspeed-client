@@ -34,6 +34,15 @@ maybe("live: orderEvents.count returns a number", async () => {
   expect(typeof count).toBe("number");
 });
 
+maybe("live: orderCustomStatuses.list parses", async () => {
+  expect(Array.isArray(await makeClient().orderCustomStatuses.list())).toBe(true);
+});
+
+maybe("live: orderCustomStatuses.get parses", async () => {
+  const cs = await makeClient().orderCustomStatuses.get(85508);
+  expect(cs.id).toBe(85508);
+});
+
 // quotes (likely empty on test shop)
 maybe("live: quotes.list returns an array", async () => {
   const items = await makeClient().quotes.list({ limit: 1 });

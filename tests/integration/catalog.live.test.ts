@@ -128,6 +128,11 @@ maybe("live: attributes.count returns a number", async () => {
   expect(typeof count).toBe("number");
 });
 
+maybe("live: typeAttributes.list parses", async () => {
+  const ta = await makeClient().typeAttributes.list({ type: 252474 });
+  expect(Array.isArray(ta)).toBe(true);
+});
+
 // tags
 maybe("live: tags.list returns typed tags", async () => {
   const items = await makeClient().tags.list({ limit: 1 });
