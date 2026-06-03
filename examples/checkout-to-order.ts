@@ -30,11 +30,11 @@ console.log("checkout:", checkout.id);
 // 2. add a product (by variant id)
 await client.checkouts.products(checkout.id).add({ variantId, quantity: 1 });
 
-// 3. choose a shipment method (ids come from the checkout's options)
+// 3. choose a shipment method (ids come from the checkout's options).
+// method id is string | number on the wire; coerce to string for the update.
 const shipMethods = await client.checkouts.shipmentMethods(checkout.id);
-await client.checkouts.update(checkout.id, {
-  shipmentMethod: shipMethods[0]?.id as string,
-});
+const shipmentMethod = String(shipMethods[0]?.id ?? "");
+await client.checkouts.update(checkout.id, { shipmentMethod });
 
 // 4. payment methods become available once a shipment method is set
 const payMethods = await client.checkouts.paymentMethods(checkout.id);
@@ -49,10 +49,10 @@ const address = {
   country: "nl",
 };
 await client.checkouts.update(checkout.id, {
-  shipmentMethod: shipMethods[0]?.id as string,
+  shipmentMethod,
   billingAddress: address,
   shippingAddress: address,
-  paymentMethod: { id: payMethods[0]?.id as string },
+  paymentMethod: { id: String(payMethods[0]?.id ?? "") },
   terms: 1,
 });
 
