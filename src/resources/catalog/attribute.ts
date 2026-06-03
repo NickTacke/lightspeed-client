@@ -8,7 +8,7 @@ export const attributeSchema = z
   .object({
     id: z.number(),
     title: z.string().optional(),
-    defaultValue: z.string().optional(),
+    defaultValue: z.string().nullable().optional(),
     types: resourceRef.optional(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),

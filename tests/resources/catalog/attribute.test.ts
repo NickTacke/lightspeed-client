@@ -27,6 +27,10 @@ test("attributeSchema parses a live attribute object (no timestamps)", () => {
   expect(a.types?.resource.id).toBe(false);
 });
 
+test("attributeSchema allows null defaultValue", () => {
+  expect(attributeSchema.safeParse({ id: 1, defaultValue: null }).success).toBe(true);
+});
+
 test("attributeUpdateSchema allows partial update without title", () => {
   const result = attributeUpdateSchema.parse({ isRequired: true });
   expect(result.isRequired).toBe(true);
