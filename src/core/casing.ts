@@ -3,6 +3,8 @@
 // verbatim. this deliberately does NOT recurse and does NOT auto-convert
 // snake<->camel, so dynamic-key maps (e.g. validation error objects keyed by
 // "shipping_address.address1.required") are never corrupted.
+// camelCase key -> wire (snake) key. wire values MUST be unique within a map:
+// fromWire reverses the map, so duplicate wire values would collide (last wins).
 export type FieldMap = Record<string, string>;
 
 // camelCase input -> wire body (drops undefined values)

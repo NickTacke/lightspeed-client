@@ -28,3 +28,12 @@ test("helpers are shallow (nested objects are not rewritten)", () => {
   const nested = { zipCode: "1", inner: { country_id: 9 } };
   expect(toWire(nested, MAP)).toEqual({ zip_code: "1", inner: { country_id: 9 } });
 });
+
+test("toWire preserves null (clears a field) but drops undefined", () => {
+  expect(toWire({ zipCode: null, city: undefined }, MAP)).toEqual({ zip_code: null });
+});
+
+test("fromWire reverses a map with unique wire values deterministically", () => {
+  const map = { aId: "a_id", bId: "b_id" } as const;
+  expect(fromWire({ a_id: 1, b_id: 2 }, map)).toEqual({ aId: 1, bId: 2 });
+});
