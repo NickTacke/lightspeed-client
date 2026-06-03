@@ -68,6 +68,12 @@ export type {
 } from "./resources/catalog/brand";
 export { TypeResource } from "./resources/catalog/type";
 export type { Type, TypeInput, TypeUpdate, TypeFilters } from "./resources/catalog/type";
+export { TypeAttributeResource } from "./resources/catalog/type-attribute";
+export type {
+  TypeAttribute,
+  TypeAttributeInput,
+  TypeAttributeFilters,
+} from "./resources/catalog/type-attribute";
 export { AttributeResource } from "./resources/catalog/attribute";
 export type {
   Attribute,
@@ -89,6 +95,12 @@ export type {
   OrderEvent,
   OrderCreditInput,
 } from "./resources/sales/order";
+export { OrderCustomStatusResource } from "./resources/sales/order-custom-status";
+export type {
+  OrderCustomStatus,
+  OrderCustomStatusInput,
+  OrderCustomStatusUpdate,
+} from "./resources/sales/order-custom-status";
 export {
   QuoteResource,
   QuoteProductResource,
