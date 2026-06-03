@@ -11,7 +11,7 @@ export const metafieldSchema = timestamps
     owner: z.string().optional(),
     namespace: z.string().optional(),
     key: z.string(),
-    value: z.string(),
+    value: z.union([z.string(), z.number()]),
     description: z.string().optional(),
     valueType: z.string().optional(),
   })
