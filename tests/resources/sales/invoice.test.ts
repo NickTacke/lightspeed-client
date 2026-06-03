@@ -20,21 +20,57 @@ class FakeTransport {
 }
 
 const sample = {
-  id: 3001,
+  id: 332615050,
   createdAt: "2026-01-01T00:00:00+00:00",
   updatedAt: "2026-01-01T00:00:00+00:00",
-  number: 3001,
-  status: "open",
-  email: "user@example.com",
+  number: "INV00001",
+  status: "not_paid",
+  priceExcl: 41.32,
   priceIncl: 49.99,
-  customer: false,
+  isVatShifted: false,
+  doNotifyNew: true,
+  doNotifyPaid: false,
+  invoice: false,
+  isCreditNote: false,
+  creditNote: false,
+  order: { resource: { id: 1, url: "https://example.com/orders/1.json", link: "orders/1" } },
+  customer: {
+    resource: { id: 1, url: "https://example.com/customers/1.json", link: "customers/1" },
+  },
+  items: {
+    resource: {
+      id: false,
+      url: "https://example.com/invoices/1/items.json",
+      link: "invoices/1/items",
+    },
+  },
+  metafields: {
+    resource: {
+      id: false,
+      url: "https://example.com/invoices/1/metafields.json",
+      link: "invoices/1/metafields",
+    },
+  },
+  events: {
+    resource: {
+      id: false,
+      url: "https://example.com/invoices/1/events.json",
+      link: "invoices/1/events",
+    },
+  },
 };
 
-test("invoiceSchema parses a docs-derived sample", () => {
+test("invoiceSchema parses a live-shaped sample", () => {
   const inv = invoiceSchema.parse(sample);
-  expect(inv.id).toBe(3001);
-  expect(inv.status).toBe("open");
-  expect(inv.customer).toBe(false);
+  expect(inv.id).toBe(332615050);
+  expect(inv.number).toBe("INV00001");
+  expect(inv.status).toBe("not_paid");
+});
+
+test("invoiceSchema accepts customer: false (customer-less invoice)", () => {
+  expect(
+    invoiceSchema.safeParse({ id: 1, createdAt: "x", updatedAt: "y", customer: false }).success,
+  ).toBe(true);
 });
 
 test("invoiceSchema preserves unknown fields via passthrough", () => {

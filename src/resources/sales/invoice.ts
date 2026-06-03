@@ -37,33 +37,26 @@ export class InvoiceItemResource extends Resource<InvoiceItem> {
   get = (id: number) => this.get_(id);
 }
 
-// docs-derived schema (unvalidated live)
+// live-validated against invoice 332615050 ("INV00001")
 export const invoiceSchema = timestamps
   .extend({
     id: z.number(),
-    number: z.number().optional(),
+    number: z.string().optional(),
     status: z.string().optional(),
-    customerId: z.number().nullable().optional(),
-    firstname: z.string().optional(),
-    lastname: z.string().optional(),
-    company: z.string().optional(),
-    email: z.string().optional(),
-    phone: z.string().optional(),
-    gender: z.string().optional(),
-    isCompany: z.boolean().optional(),
-    addressBillingStreet: z.string().optional(),
-    addressBillingStreet2: z.string().optional(),
-    addressBillingNumber: z.string().optional(),
-    addressBillingZipcode: z.string().optional(),
-    addressBillingCity: z.string().optional(),
-    addressBillingRegion: z.string().optional(),
-    addressBillingCountry: z.string().optional(),
+    isVatShifted: z.boolean().optional(),
     priceExcl: z.number().optional(),
     priceIncl: z.number().optional(),
-    customer: orFalse(resourceRef).optional(),
+    doNotifyNew: z.boolean().optional(),
+    doNotifyPaid: z.boolean().optional(),
+    // self/related invoice reference; false when absent, shape otherwise unverified live
+    invoice: z.unknown().optional(),
+    isCreditNote: z.boolean().optional(),
+    creditNote: orFalse(resourceRef).optional(),
     order: resourceRef.optional(),
+    customer: orFalse(resourceRef).optional(),
     items: resourceRef.optional(),
     metafields: resourceRef.optional(),
+    events: resourceRef.optional(),
   })
   .passthrough();
 export type Invoice = z.infer<typeof invoiceSchema>;
@@ -77,7 +70,7 @@ export type InvoiceUpdate = z.input<typeof invoiceUpdateSchema>;
 export interface InvoiceFilters {
   status?: string;
   email?: string;
-  number?: number;
+  number?: string;
 }
 
 export class InvoiceResource extends Resource<Invoice> {

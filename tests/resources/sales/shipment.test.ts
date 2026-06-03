@@ -20,21 +20,47 @@ class FakeTransport {
 }
 
 const sample = {
-  id: 4001,
+  id: 305761114,
   createdAt: "2026-01-01T00:00:00+00:00",
   updatedAt: "2026-01-01T00:00:00+00:00",
-  number: 4001,
+  number: "SHIP00001",
   status: "not_shipped",
   trackingCode: "TRACK123",
-  carrier: "PostNL",
-  customer: false,
+  doNotifyShipped: false,
+  doNotifyReadyForPickup: false,
+  doNotifyTrackingCode: false,
+  customer: {
+    resource: { id: 1, url: "https://example.com/customers/1.json", link: "customers/1" },
+  },
+  order: { resource: { id: 1, url: "https://example.com/orders/1.json", link: "orders/1" } },
+  products: {
+    resource: {
+      id: false,
+      url: "https://example.com/shipments/1/products.json",
+      link: "shipments/1/products",
+    },
+  },
+  metafields: {
+    resource: {
+      id: false,
+      url: "https://example.com/shipments/1/metafields.json",
+      link: "shipments/1/metafields",
+    },
+  },
+  events: {
+    resource: {
+      id: false,
+      url: "https://example.com/shipments/1/events.json",
+      link: "shipments/1/events",
+    },
+  },
 };
 
-test("shipmentSchema parses a docs-derived sample", () => {
+test("shipmentSchema parses a live-shaped sample", () => {
   const s = shipmentSchema.parse(sample);
-  expect(s.id).toBe(4001);
+  expect(s.id).toBe(305761114);
+  expect(s.number).toBe("SHIP00001");
   expect(s.trackingCode).toBe("TRACK123");
-  expect(s.customer).toBe(false);
 });
 
 test("shipmentSchema preserves unknown fields via passthrough", () => {

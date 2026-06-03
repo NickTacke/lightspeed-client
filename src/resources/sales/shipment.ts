@@ -40,30 +40,21 @@ export class ShipmentProductResource extends Resource<ShipmentProduct> {
   get = (id: number) => this.get_(id);
 }
 
-// docs-derived schema (unvalidated live)
+// live-validated against shipment 305761114 ("SHIP00001")
 export const shipmentSchema = timestamps
   .extend({
     id: z.number(),
-    number: z.number().optional(),
+    number: z.string().optional(),
     status: z.string().optional(),
     trackingCode: z.string().optional(),
-    trackingUrl: z.string().optional(),
-    carrier: z.string().optional(),
-    firstname: z.string().optional(),
-    lastname: z.string().optional(),
-    company: z.string().optional(),
-    email: z.string().optional(),
-    addressStreet: z.string().optional(),
-    addressStreet2: z.string().optional(),
-    addressNumber: z.string().optional(),
-    addressZipcode: z.string().optional(),
-    addressCity: z.string().optional(),
-    addressRegion: z.string().optional(),
-    addressCountry: z.string().optional(),
+    doNotifyShipped: z.boolean().optional(),
+    doNotifyReadyForPickup: z.boolean().optional(),
+    doNotifyTrackingCode: z.boolean().optional(),
     customer: orFalse(resourceRef).optional(),
     order: resourceRef.optional(),
     products: resourceRef.optional(),
     metafields: resourceRef.optional(),
+    events: resourceRef.optional(),
   })
   .passthrough();
 export type Shipment = z.infer<typeof shipmentSchema>;
