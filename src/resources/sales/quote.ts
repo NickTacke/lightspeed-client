@@ -130,7 +130,7 @@ export const quoteSchema = timestamps
     shipmentId: z.union([z.string(), z.literal(false)]).optional(),
     shipmentIsSet: z.boolean().optional(),
     shipmentTitle: z.string().optional(),
-    paymentId: z.string().optional(),
+    paymentId: z.union([z.string(), z.literal(false)]).optional(),
     paymentIsSet: z.boolean().optional(),
     paymentTitle: z.string().optional(),
     discountIsSet: z.boolean().optional(),
