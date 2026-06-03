@@ -45,6 +45,7 @@
     "format": "biome format --write .",
     "check": "biome check . && tsc --noEmit && bun test",
     "prepublishOnly": "bun run build",
+    "ci:version": "changeset version && biome format --write package.json",
     "release": "changeset publish"
   },
   "dependencies": {
