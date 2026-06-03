@@ -2,7 +2,7 @@ import { z } from "zod";
 import { orFalse, resourceRef, timestamps } from "../../core/fragments";
 import { Resource } from "../../core/resource";
 
-// docs-derived schema (test shop has no returns — unvalidated live)
+// docs-derived: the test shop has no returns, so this schema is unvalidated against live data
 export const returnSchema = timestamps
   .extend({
     id: z.number(),

@@ -116,3 +116,9 @@ maybe("live: shipments.get parses the seeded shipment", async () => {
   const sh = await makeClient().shipments.get(305761114);
   expect(sh.number).toBe("SHIP00001");
 });
+
+maybe("live: quotes.get parses the seeded quote", async () => {
+  const q = await makeClient().quotes.get(1501464656);
+  expect(q.id).toBe(1501464656);
+  expect(typeof q.productsQuantity).toBe("number");
+});
