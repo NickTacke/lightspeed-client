@@ -41,7 +41,7 @@ export const orderProductSchema = z
     priceIncl: z.number().optional(),
     discountExcl: z.number().optional(),
     discountIncl: z.number().optional(),
-    customFields: z.union([z.boolean(), z.record(z.unknown())]).optional(),
+    customFields: orFalse(z.record(z.unknown())).optional(),
     product: resourceRef.optional(),
     variant: orFalse(resourceRef).optional(),
   })
@@ -125,6 +125,7 @@ export const orderSchema = timestamps
     volume: z.number().optional(),
     colli: z.number().optional(),
     gender: z.union([z.string(), z.literal(false)]).optional(),
+    // live returns false ("not set"); null kept defensively for shops that send it
     birthDate: z
       .union([z.string(), z.literal(false)])
       .nullable()
@@ -150,7 +151,7 @@ export const orderSchema = timestamps
     addressBillingCity: z.string().optional(),
     addressBillingRegion: z.string().optional(),
     addressBillingCountry: orFalse(countryObject).optional(),
-    addressBillingRegionData: z.union([z.boolean(), z.record(z.unknown())]).optional(),
+    addressBillingRegionData: orFalse(z.record(z.unknown())).optional(),
     addressShippingCompany: z.union([z.string(), z.literal(false)]).optional(),
     addressShippingName: z.string().optional(),
     addressShippingStreet: z.string().optional(),
@@ -161,7 +162,7 @@ export const orderSchema = timestamps
     addressShippingCity: z.string().optional(),
     addressShippingRegion: z.string().optional(),
     addressShippingCountry: orFalse(countryObject).optional(),
-    addressShippingRegionData: z.union([z.boolean(), z.record(z.unknown())]).optional(),
+    addressShippingRegionData: orFalse(z.record(z.unknown())).optional(),
     paymentId: z.string().optional(),
     paymentStatus: z.nativeEnum(OrderPaymentStatus).optional(),
     paymentIsPost: z.boolean().optional(),
@@ -232,7 +233,7 @@ export interface OrderFilters {
   shipmentStatus?: OrderShipmentStatus;
   customerId?: number;
   email?: string;
-  number?: number;
+  number?: string;
 }
 
 export class OrderResource extends Resource<Order> {
