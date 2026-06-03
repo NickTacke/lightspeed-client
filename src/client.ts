@@ -6,6 +6,7 @@ import { AttributeResource } from "./resources/catalog/attribute";
 import { BrandResource } from "./resources/catalog/brand";
 import { CategoryResource } from "./resources/catalog/category";
 import { ProductResource } from "./resources/catalog/product";
+import { QuantityDiscountResource } from "./resources/catalog/quantity-discount";
 import { TagResource } from "./resources/catalog/tag";
 import { TypeResource } from "./resources/catalog/type";
 import { VariantMovementResource, VariantResource } from "./resources/catalog/variant";
@@ -37,6 +38,7 @@ export class LightspeedClient {
   readonly types: TypeResource;
   readonly attributes: AttributeResource;
   readonly tags: TagResource;
+  readonly quantityDiscounts: QuantityDiscountResource;
   readonly orders: OrderResource;
   readonly orderEvents: OrderEventResource;
   readonly quotes: QuoteResource;
@@ -62,6 +64,7 @@ export class LightspeedClient {
     this.types = new TypeResource(this.transport);
     this.attributes = new AttributeResource(this.transport);
     this.tags = new TagResource(this.transport);
+    this.quantityDiscounts = new QuantityDiscountResource(this.transport);
     this.orders = new OrderResource(this.transport);
     this.orderEvents = new OrderEventResource(this.transport);
     this.quotes = new QuoteResource(this.transport);
