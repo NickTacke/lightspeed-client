@@ -3,9 +3,12 @@ import { fileObject, orFalse, resourceRef, timestamps } from "../../core/fragmen
 import { Resource } from "../../core/resource";
 import { MetafieldResource } from "../shared/metafield";
 
-export const variantMovementSchema = timestamps
-  .extend({
+// live: variant movements have createdAt but no updatedAt
+export const variantMovementSchema = z
+  .object({
     id: z.number(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
     type: z.string().optional(),
     amount: z.number().optional(),
     description: z.string().optional(),

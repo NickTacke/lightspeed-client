@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { EXCEPTIONS } from "../../core/endpoints";
 import { LightspeedValidationError } from "../../core/errors";
-import { orFalse, resourceRef, timestamps } from "../../core/fragments";
+import { countryObject, orFalse, resourceRef, timestamps } from "../../core/fragments";
 import type { Transport } from "../../core/http";
 import { Resource } from "../../core/resource";
 import { MetafieldResource } from "../shared/metafield";
@@ -31,7 +31,7 @@ export const customerSchema = timestamps
     addressBillingZipcode: z.string().optional(),
     addressBillingCity: z.string().optional(),
     addressBillingRegion: z.string().optional(),
-    addressBillingCountry: z.string().optional(),
+    addressBillingCountry: orFalse(countryObject).optional(),
     addressShippingName: z.string().optional(),
     addressShippingStreet: z.string().optional(),
     addressShippingStreet2: z.string().optional(),
@@ -40,7 +40,7 @@ export const customerSchema = timestamps
     addressShippingZipcode: z.string().optional(),
     addressShippingCity: z.string().optional(),
     addressShippingRegion: z.string().optional(),
-    addressShippingCountry: z.string().optional(),
+    addressShippingCountry: orFalse(countryObject).optional(),
     memo: z.string().nullable().optional(),
     doNotifyRegistered: z.boolean().optional(),
     groups: orFalse(resourceRef).optional(),

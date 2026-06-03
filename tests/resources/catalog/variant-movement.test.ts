@@ -1,5 +1,8 @@
 import { expect, test } from "bun:test";
-import { VariantMovementResource } from "../../../src/resources/catalog/variant";
+import {
+  VariantMovementResource,
+  variantMovementSchema,
+} from "../../../src/resources/catalog/variant";
 
 class FakeTransport {
   // biome-ignore lint/suspicious/noExplicitAny: test fake
@@ -43,12 +46,22 @@ test("VariantMovementResource.count hits variants/movements/count.json", async (
   expect(t.calls[0]).toMatchObject({ method: "GET", path: "variants/movements/count.json" });
 });
 
+test("variantMovementSchema parses a live movement without updatedAt", () => {
+  const mv = variantMovementSchema.parse({
+    id: 99,
+    createdAt: "2026-01-01T00:00:00+00:00",
+    type: "manual",
+    amount: -1,
+  });
+  expect(mv.id).toBe(99);
+  expect(mv.updatedAt).toBeUndefined();
+});
+
 test("VariantMovementResource.get hits variants/movements/{id}.json", async () => {
   const t = new FakeTransport(() => ({
     variantMovement: {
       id: 99,
       createdAt: "2026-01-01T00:00:00+00:00",
-      updatedAt: "2026-01-01T00:00:00+00:00",
     },
   }));
   // biome-ignore lint/suspicious/noExplicitAny: test fake cast
