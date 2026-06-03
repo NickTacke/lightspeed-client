@@ -1,5 +1,17 @@
 import { expect, test } from "bun:test";
-import { shopSchema } from "../../../src/resources/store/shop";
+import { ShopResource, shopSchema } from "../../../src/resources/store/shop";
+
+class FakeTransport {
+  // biome-ignore lint/suspicious/noExplicitAny: test fake
+  calls: any[] = [];
+  // biome-ignore lint/suspicious/noExplicitAny: test fake
+  constructor(private responder: (a: any) => any) {}
+  // biome-ignore lint/suspicious/noExplicitAny: test fake
+  async send(args: any) {
+    this.calls.push(args);
+    return this.responder(args);
+  }
+}
 
 // trimmed from live GET /nl/shop.json (id 356891, 2026-06-02)
 const sample = {
@@ -59,4 +71,29 @@ test("shopSchema preserves unknown fields via passthrough", () => {
     javascript: { resource: { id: false, url: "shop/javascript", link: "https://x" } },
   });
   expect((s as Record<string, unknown>).javascript).toBeDefined();
+});
+
+test("ShopResource.metafields().list hits shop/metafields.json with shopMetafields envelope", async () => {
+  const t = new FakeTransport(() => ({ shopMetafields: [] }));
+  // biome-ignore lint/suspicious/noExplicitAny: test fake cast
+  const r = new ShopResource(t as any);
+  const mf = r.metafields();
+  expect(typeof mf.list).toBe("function");
+  const list = await mf.list();
+  expect(list).toEqual([]);
+  expect(t.calls[0]).toMatchObject({ method: "GET", path: "shop/metafields.json" });
+});
+
+test("ShopResource.metafields().create POSTs shop/metafields.json with shopMetafield envelope", async () => {
+  const t = new FakeTransport(() => ({
+    shopMetafield: { id: 1, createdAt: "x", updatedAt: "x", key: "k", value: "v" },
+  }));
+  // biome-ignore lint/suspicious/noExplicitAny: test fake cast
+  const r = new ShopResource(t as any);
+  await r.metafields().create({ key: "k", value: "v" });
+  expect(t.calls[0]).toMatchObject({
+    method: "POST",
+    path: "shop/metafields.json",
+    body: { shopMetafield: { key: "k", value: "v" } },
+  });
 });
