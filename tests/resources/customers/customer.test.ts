@@ -35,8 +35,8 @@ const sample = {
   companyName: "",
   companyCoCNumber: "",
   companyVatNumber: "",
-  addressBillingCountry: "nl",
-  addressShippingCountry: "nl",
+  addressBillingCountry: { id: 150, code: "nl", code3: "nld", title: "Netherlands, The" },
+  addressShippingCountry: { id: 150, code: "nl", code3: "nld", title: "Netherlands, The" },
   memo: null,
   doNotifyRegistered: true,
   groups: false,
@@ -49,6 +49,9 @@ test("customerSchema parses a docs-derived customer sample", () => {
   expect(c.email).toBe("john@example.com");
   expect(c.groups).toBe(false);
   expect(c.memo).toBeNull();
+  // live: country fields are objects, not strings
+  expect(c.addressBillingCountry).toMatchObject({ code: "nl", title: "Netherlands, The" });
+  expect(c.addressShippingCountry).toMatchObject({ code: "nl", title: "Netherlands, The" });
 });
 
 test("customerSchema preserves unknown fields via passthrough", () => {
