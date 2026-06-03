@@ -83,8 +83,8 @@ export type OrderEvent = z.infer<typeof orderEventSchema>;
 export class OrderEventResource extends Resource<OrderEvent> {
   protected base = "orders/events";
   protected schema = orderEventSchema;
-  protected singular = "orderEvent";
-  protected plural = "orderEvents";
+  protected singular = "ordersEvent";
+  protected plural = "ordersEvents";
 
   list = (q?: Parameters<OrderEventResource["list_"]>[0]) => this.list_(q);
   count = (q?: Record<string, unknown>) => this.count_(q);

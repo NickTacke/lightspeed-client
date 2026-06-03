@@ -159,7 +159,7 @@ test("client.orderEvents is a top-level OrderEventResource (orders/events)", asy
 });
 
 test("OrderEventResource hits orders/events.json", async () => {
-  const t = new FakeTransport(() => ({ orderEvents: [] }));
+  const t = new FakeTransport(() => ({ ordersEvents: [] }));
   // biome-ignore lint/suspicious/noExplicitAny: test fake cast
   const r = new OrderEventResource(t as any);
   const result = await r.list();
