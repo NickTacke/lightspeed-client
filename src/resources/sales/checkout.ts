@@ -12,6 +12,10 @@ import type { ListQuery } from "../../core/types";
 // mapping is deliberately NOT recursive — nested objects (validate errors,
 // nested products) keep their wire keys, which is intentional.
 
+// the product add endpoint returns money/discount fields as strings while the
+// same fields embedded in a checkout get come back as numbers — tolerate both.
+const numericLike = z.union([z.number(), z.string()]);
+
 // camelCase -> wire (snake) field maps
 const CHECKOUT_MAP = {
   createdAt: "created_at",
@@ -89,20 +93,20 @@ export const checkoutProductSchema = z
     variantId: z.number().optional(),
     isCustom: z.boolean().nullable().optional(),
     customChecksum: z.string().nullable().optional(),
-    customData: z.union([z.record(z.unknown()), z.null()]).optional(),
+    customData: z.unknown().optional(),
     quantity: z.number().optional(),
     hasDiscount: z.boolean().optional(),
-    discountPercentage: z.number().optional(),
-    taxRate: z.number().optional(),
-    basePriceExcl: z.number().optional(),
-    basePriceIncl: z.number().optional(),
-    basePriceCost: z.number().optional(),
-    priceExcl: z.number().optional(),
-    priceIncl: z.number().optional(),
-    priceCost: z.number().optional(),
-    priceTax: z.number().optional(),
-    discountExcl: z.number().optional(),
-    discountIncl: z.number().optional(),
+    discountPercentage: numericLike.optional(),
+    taxRate: numericLike.optional(),
+    basePriceExcl: numericLike.optional(),
+    basePriceIncl: numericLike.optional(),
+    basePriceCost: numericLike.optional(),
+    priceExcl: numericLike.optional(),
+    priceIncl: numericLike.optional(),
+    priceCost: numericLike.optional(),
+    priceTax: numericLike.optional(),
+    discountExcl: numericLike.optional(),
+    discountIncl: numericLike.optional(),
     title: z.string().nullable().optional(),
     fulltitle: z.string().nullable().optional(),
     variant: z.string().nullable().optional(),
@@ -116,7 +120,7 @@ export const checkoutProductSchema = z
     url: z.string().nullable().optional(),
     stockAvailable: z.boolean().optional(),
     stockOnStock: z.boolean().optional(),
-    stockLevel: z.number().optional(),
+    stockLevel: numericLike.optional(),
   })
   .passthrough();
 export type CheckoutProduct = z.infer<typeof checkoutProductSchema>;
