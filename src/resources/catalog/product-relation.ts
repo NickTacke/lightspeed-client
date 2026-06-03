@@ -31,6 +31,7 @@ export class ProductRelationResource extends Resource<ProductRelation> {
   }
 
   list = (q?: Parameters<ProductRelationResource["list_"]>[0]) => this.list_(q);
+  paginate = (q?: Parameters<ProductRelationResource["list_"]>[0]) => this.paginate_(q);
   count = (q?: Record<string, unknown>) => this.count_(q);
   get = (id: number) => this.get_(id);
   create = (input: ProductRelationInput) => this.create_(productRelationInputSchema, input);

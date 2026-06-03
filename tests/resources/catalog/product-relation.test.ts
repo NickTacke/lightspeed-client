@@ -33,6 +33,7 @@ test("products.relations(5).create POSTs products/5/relations.json with productR
   const r = new ProductResource(t as any);
   const rels = r.relations(5);
   expect(rels).toBeInstanceOf(ProductRelationResource);
+  expect(typeof rels.paginate).toBe("function");
   await rels.create({ relatedProduct: 9 });
   expect(t.calls[0]).toMatchObject({
     method: "POST",

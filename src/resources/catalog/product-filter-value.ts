@@ -32,6 +32,7 @@ export class ProductFilterValueResource extends Resource<ProductFilterValue> {
   }
 
   list = (q?: Parameters<ProductFilterValueResource["list_"]>[0]) => this.list_(q);
+  paginate = (q?: Parameters<ProductFilterValueResource["list_"]>[0]) => this.paginate_(q);
   count = (q?: Record<string, unknown>) => this.count_(q);
   get = (id: number) => this.get_(id);
   create = (input: ProductFilterValueInput) => this.create_(productFilterValueInputSchema, input);

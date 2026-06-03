@@ -29,6 +29,7 @@ test("products.attributes(5).update PUTs products/5/attributes/7.json with produ
   const r = new ProductResource(t as any);
   const attrs = r.attributes(5);
   expect(attrs).toBeInstanceOf(ProductAttributeResource);
+  expect(typeof attrs.paginate).toBe("function");
   await attrs.update(7, { value: "x" });
   expect(t.calls[0]).toMatchObject({
     method: "PUT",

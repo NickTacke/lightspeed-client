@@ -26,6 +26,7 @@ export class ProductAttributeResource extends Resource<ProductAttribute> {
   }
 
   list = (q?: Parameters<ProductAttributeResource["list_"]>[0]) => this.list_(q);
+  paginate = (q?: Parameters<ProductAttributeResource["list_"]>[0]) => this.paginate_(q);
   count = (q?: Record<string, unknown>) => this.count_(q);
   get = (id: number) => this.get_(id);
   update = (id: number, input: ProductAttributeUpdate) =>

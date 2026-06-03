@@ -33,6 +33,7 @@ test("products.filterValues(5).create POSTs with productFiltervalue envelope", a
   const r = new ProductResource(t as any);
   const fvs = r.filterValues(5);
   expect(fvs).toBeInstanceOf(ProductFilterValueResource);
+  expect(typeof fvs.paginate).toBe("function");
   await fvs.create({ filter: 1, filtervalue: 2 });
   expect(t.calls[0]).toMatchObject({
     method: "POST",
