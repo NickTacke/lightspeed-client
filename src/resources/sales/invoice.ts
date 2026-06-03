@@ -48,9 +48,9 @@ export const invoiceSchema = timestamps
     priceIncl: z.number().optional(),
     doNotifyNew: z.boolean().optional(),
     doNotifyPaid: z.boolean().optional(),
-    invoice: z.union([z.boolean(), z.string()]).optional(),
+    invoice: orFalse(z.string()).optional(),
     isCreditNote: z.boolean().optional(),
-    creditNote: z.union([z.boolean(), resourceRef]).optional(),
+    creditNote: orFalse(resourceRef).optional(),
     order: resourceRef.optional(),
     customer: resourceRef.optional(),
     items: resourceRef.optional(),
@@ -69,7 +69,7 @@ export type InvoiceUpdate = z.input<typeof invoiceUpdateSchema>;
 export interface InvoiceFilters {
   status?: string;
   email?: string;
-  number?: number;
+  number?: string;
 }
 
 export class InvoiceResource extends Resource<Invoice> {
